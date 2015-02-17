@@ -12,7 +12,7 @@ socks:
 	$(MAKE) -C ./middleware/
 
 hip:
-	$(MAKE) -C ./protocols/openhip/
+	$(MAKE) -C ./protocols/hipl-1.0.8/
 
 mip6d:
 	$(MAKE) -C ./protocols/umip/
