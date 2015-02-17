@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake libtool bzr libnetfilter-queue-dev libssl-dev
+sudo apt-get install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake cmake libtool bzr libnetfilter-queue-dev libssl-dev libnl-3-dev libnl-route-3-dev libnl-genl-3-dev
 #libcurl4-openssl-dev perl-Net-IP perl-Net-DNS
 
 if [ ! -f "/usr/include/rasqal.h" ]
@@ -23,13 +23,11 @@ then
 	popd
 fi
 
-if [ ! -d "./protocols/hip/hipl-1.0.8" ]
-then
-	pushd ./protocols/hip
-	tar zxvf hipl-1.0.8.tar.gz
-	./hipl-1.0.8/configure
-	popd
-fi
+# hip
+pushd ./protocols/hip
+tar zxvf hipl-1.0.8.tar.gz
+./hipl-1.0.8/configure
+popd
 
 if [ ! -f "./protocols/umip/Makefile" ]
 then
@@ -38,13 +36,13 @@ then
 	popd
 fi
 
+# boost
 if [ ! -d "./protocols/mih/boost_1_48_0" ]
 then
 	wget http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz -P ./protocols/mih/
 	tar -C ./protocols/mih -zxvf ./protocols/mih/boost_1_48_0.tar.gz
 	rm ./protocols/mih/boost_1_48_0.tar.gz
 fi
-
 pushd ./protocols/mih/boost_1_48_0
 ./bootstrap.sh
 ./b2
@@ -52,12 +50,11 @@ sudo ./b2 install
 sudo cp b2 /usr/local/sbin/b2
 popd
 
-if [ ! -d "./protocols/mih/odtone-0.6" ]
-then
-	pushd ./protocols/mih
-	tar zxvf odtone-0.6.tar.gz
-	popd
-fi
+# mih
+pushd ./protocols/mih
+tar zxvf odtone-0.6.tar.gz
+popd
+
 
 if [ -z `grep -r sine /etc/iproute2/rt_tables` ]
 then
