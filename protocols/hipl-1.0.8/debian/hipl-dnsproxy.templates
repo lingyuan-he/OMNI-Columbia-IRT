@@ -1,5 +1,0 @@
-Template: hipl-dnsproxy/dnsmasq
-Type: note
-Description: Running with other DNS server software
- Another DNS server has been detected. Please see HOWTO document for more
- information.

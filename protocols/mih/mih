@@ -21,7 +21,7 @@ function clean {
 clean
 
 SINE_ROOT=
-ROOT_DIR=$SINE_ROOT/protocols/mih/odtone
+ROOT_DIR=$SINE_ROOT/protocols/mih/odtone-0.6
 
 pushd $ROOT_DIR/dist
 

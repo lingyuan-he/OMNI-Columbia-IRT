@@ -6,30 +6,23 @@ BJAM=b2
 SED=sed
 PWD=$(shell pwd)
 
-all: socks hip mip6d mih lm
+all: socks hip mih lm
 
 socks:
 	$(MAKE) -C ./middleware/
 
 hip:
-	$(MAKE) -C ./protocols/hipl-1.0.8/
-
-mip6d:
-	$(MAKE) -C ./protocols/umip/
+	$(MAKE) -C ./protocols/hip/hipl-1.0.8/
 
 mih:
-	$(CD) ./protocols/mih/odtone; $(BJAM) -q linkflags=-lpthread
+	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) -q linkflags=-lpthread
 
 lm: ./middleware/locationMgr/locationMgr.cpp
 	$(CPP) ./middleware/locationMgr/locationMgr.cpp -o ./middleware/locationMgr/lm -lpthread 
 
 install:
 	./middleware/kill_sined
-	$(MAKE) -C ./protocols/openhip/ install
 	hitgen
-	$(MAKE) -C ./protocols/umip/ install
-	$(CP) ./protocols/umip/mip6d.conf /usr/local/etc/mip6d.conf
-	#$(CP) ./protocols/mih/mih /usr/local/sbin/mih
 	$(SED) 's/SINE_ROOT=/SINE_ROOT=$(subst /,\/,$(PWD))/' <./protocols/mih/mih >/usr/local/sbin/mih
 	chmod +x /usr/local/sbin/mih
 	$(CP) ./middleware/sine_policy.conf /etc/sine_policy.conf
@@ -40,6 +33,5 @@ install:
 
 clean:
 	$(MAKE) -C ./middleware/ clean
-	$(MAKE) -C ./protocols/openhip/ clean
-	$(MAKE) -C ./protocols/umip/ clean
-	$(CD) ./protocols/mih/odtone; $(BJAM) clean
+	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) clean
+

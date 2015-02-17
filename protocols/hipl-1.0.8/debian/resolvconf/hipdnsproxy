@@ -1,2 +1,0 @@
-#!/bin/sh
-/bin/kill -HUP $(/usr/bin/head -1 /var/run/hipdnsproxy.pid) > /dev/null 2>&1
