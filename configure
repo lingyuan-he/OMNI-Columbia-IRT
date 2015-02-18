@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# configuration script of OMNI project
+
 sudo apt-get install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake libtool bzr libnetfilter-queue-dev libssl-dev libnl-3-dev libnl-route-3-dev libnl-genl-3-dev
 #libcurl4-openssl-dev perl-Net-IP perl-Net-DNS
 
+#raptor backward support
 if [ ! -f "/usr/include/rasqal.h" ]
 then
 	sudo ln -s /usr/include/rasqal/rasqal.h /usr/include/rasqal.h
@@ -31,13 +34,6 @@ pushd ./hipl-1.0.8
 popd
 popd
 
-if [ ! -f "./protocols/umip/Makefile" ]
-then
-	pushd ./protocols/umip
-	./configure
-	popd
-fi
-
 # boost
 if [ ! -d "./protocols/mih/boost_1_48_0" ]
 then
@@ -56,8 +52,14 @@ popd
 pushd ./protocols/mih
 tar zxvf odtone-0.6.tar.gz
 cp ./boost-build.jam ./odtone-0.6
+tar zxvf dist.tar.gz
+mkdir ./odtone-0.6/dist/
+cd dist
+cp -r * ../odtone-0.6/dist/
+cd ../
 popd
 
+# ip table
 if [ -z `grep -r sine /etc/iproute2/rt_tables` ]
 then
 	cp /etc/iproute2/rt_tables ./
