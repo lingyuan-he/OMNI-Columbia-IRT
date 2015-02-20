@@ -15,7 +15,7 @@ hip:
 	$(MAKE) -C ./protocols/hip/hipl-1.0.8/
 
 mih:
-	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) --boost-root=../boost_1_48_0 --linkflags=-lpthread
+	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) --boost-root=../boost_1_48_0 linkflags=-lpthread
 
 lm: ./middleware/locationMgr/locationMgr.cpp
 	$(CPP) ./middleware/locationMgr/locationMgr.cpp -o ./middleware/locationMgr/lm -lpthread 
