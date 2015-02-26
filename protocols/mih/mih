@@ -20,8 +20,8 @@ function clean {
 
 clean
 
-SINE_ROOT=
-ROOT_DIR=$SINE_ROOT/protocols/mih/odtone-0.6
+OMNI_ROOT=
+ROOT_DIR=$OMNI_ROOT/protocols/mih/odtone-0.6
 
 pushd $ROOT_DIR/dist
 
