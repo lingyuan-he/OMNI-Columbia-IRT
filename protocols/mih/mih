@@ -2,7 +2,7 @@
 
 #clean all the daemon processes
 function clean {
-	for p in "mih_usr" "odtone-mihf" "link_sap" "miis_rdf_server"; do
+	for p in "mih_usr" "odtone-mihf" "link_sap"; do # "miis_rdf_server"; do
         	while true; do
                 	echo "ps ax | grep $p$ | awk '{print \$1}'"
                 	id="$(ps ax | grep $p$ | awk '{print $1}')"
@@ -28,7 +28,7 @@ pushd $ROOT_DIR/dist
 #run odtone-mihf, mih_usr and three link_saps
 ./odtone-mihf 1> output &
 sleep 1
-./miis_rdf_server 1> output_miis &
+#./miis_rdf_server 1> output_miis &
 cd 802_3
 ../link_sap 1> output &
 cd ../802_11

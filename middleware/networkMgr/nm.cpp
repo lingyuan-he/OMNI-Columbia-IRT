@@ -66,6 +66,7 @@ char* ipc_nm(char* buf, int listener_sock)
 		return NULL;
 	}
 
+	printf("Receiving: %s\n", buf);
 	if (listener_sock < 0)
 	{
 		close(sockfd);

@@ -51,12 +51,11 @@ popd
 # mih
 pushd ./protocols/mih
 tar zxvf odtone-0.6.tar.gz
+# boost build file
 cp ./boost-build.jam ./odtone-0.6
-tar zxvf dist.tar.gz
-mkdir -p ./odtone-0.6/dist/
-cd dist
-cp -r * ../odtone-0.6/dist/
-cd ../
+# mih usr source
+mv ./odtone-0.6/app/mih_usr/mih_usr.cpp ./odtone-0.6/app/mih_usr/mih_usr_backup.cpp 
+cp mih_usr.cpp ./odtone-0.6/app/mih_usr
 popd
 
 # ip table

@@ -4,9 +4,11 @@ GCC=gcc
 CPP=g++
 BJAM=b2
 SED=sed
+TAR=tar
+RM=rm
 PWD=$(shell pwd)
 
-all: socks hip mih lm
+all: socks hip mih lm additional
 
 socks:
 	$(MAKE) -C ./middleware/
@@ -19,6 +21,9 @@ mih:
 
 lm: ./middleware/locationMgr/locationMgr.cpp
 	$(CPP) ./middleware/locationMgr/locationMgr.cpp -o ./middleware/locationMgr/lm -lpthread 
+
+additional:
+	$(CD) ./protocols/mih/; $(TAR) zxvf dist.tar.gz; $(CD) dist; $(CP) -r * ../odtone-0.6/dist; $(CD) ../; $(RM) -rf dist
 
 install:
 	./middleware/kill_sined
