@@ -976,6 +976,7 @@ void *socket_handler(void *arg)
 			switch (buf[0])
 			{
 			case 'e':
+				// received interface query from sined, return up/down
 				if (p_usr->exist_link(odtone::mih::octet_string(buf + 2)))
 				{
 					//std::cout << "up" << std::endl;
@@ -1009,12 +1010,17 @@ void *socket_handler(void *arg)
 					new client_info(cli_addr, addrlen, REQ_INFO_BANDWIDTH));
 				break;
 
-			case 'h':	//set interface for hip
+			case 'h':
+				//set interface for hip
+				
+				// ppp0, using sixxs tunnel, special case
 				if (buf[2] == 'p' && buf[3] == 'p' && buf[4] == 'p') {// && IP_VERSION == 6) {
 					send_hipd("pref sixxs");	//ipv6 tunnel for ppp0
 				} //else if (buf[2] == 'e' && buf[3] == 't' && buf[4] == 'h') {// && IP_VERSION == 6) {
 				//	send_hipd("pref he-ipv6");	//ipv6 tunnel for eth0
 				//}
+				
+				// otherwise pass on to hipd
 				else {
 					send_hipd("pref " + odtone::mih::octet_string(buf + 2));
 				}
