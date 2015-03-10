@@ -31,7 +31,6 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <pthread.h>
 
 
 #include "libcore/debug.h"
@@ -49,8 +48,6 @@
 int main(int argc, char *argv[])
 {
     uint64_t sflags = HIPD_START_FOREGROUND | HIPD_START_LOWCAP;
-	pthread_t sine_thread; /* Lingyuan - 03/2015 */
-	void *thread_return = NULL; /* Lingyuan - 03/2015 */
 
     /* The flushing is enabled by default. The reason for this is that
      * people are doing some very experimental features on some branches
@@ -78,16 +75,9 @@ int main(int argc, char *argv[])
         HIP_DIE("hipd must be started as root!\n");
     }
 
-	/* Lingyuan - 03/2015 */
-	if (pthread_create(&sine_thread, NULL, hip_sine_thread, &thread_return)) {
-		HIP_DIE("hipd canno start sine thread!\n");
-	}
- 
     if (hipd_main(sflags)) {
-    	pthread_cancel(sine_thread); /* Lingyuan - 03/2015 */
         return EXIT_FAILURE;
     }
 
-	pthread_cancel(sine_thread); /* Lingyuan - 03/2015 */
     return EXIT_SUCCESS;
 }
