@@ -31,7 +31,7 @@ if [ ! -f sqlite-autoconf-3080803.tar.gz ]; then
 fi
 tar zxvf sqlite-autoconf-3080803.tar.gz
 cd sqlite-autoconf-3080803
-./configure --prefix=${INSTALL_PATH} --host=${HOST} --build={BUILD{ CROSS_COMPILE=${TOOLCHAIN} CCC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LDFLAGS="-L${INSTALL_PATH}/lib" CPPFLAGS="-I${INSTALL_PATH}/include"
+./configure --prefix=${INSTALL_PATH} --host=${HOST} --build={BUILD{ CROSS_COMPILE=${TOOLCHAIN} CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LDFLAGS="-L${INSTALL_PATH}/lib" CPPFLAGS="-I${INSTALL_PATH}/include"
 make
 make install
 cd ../
