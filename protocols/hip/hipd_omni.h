@@ -1,0 +1,28 @@
+/* 
+ * Header for omni component in hipd 
+ * Lingyuan He - 03/2015
+ */
+
+#ifndef _HIPD_OMNI_H_
+#define _HIPD_OMNI_H_
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include "libhipl/hidb.h"
+#include <sys/socket.h>
+#include <pthread.h>
+
+#define HIPD_OMNI_PORT 7776 /* port to listen */
+
+pthread_mutex_t hipd_omni_mutex; /* mutex for setting preference */
+char lsi_addr[INET_ADDRSTRLEN]; /* hip lsi address */
+char hipd_omni_ifname[8]; /* current interface name */
+int hipd_omni_socket; /* socket fd */
+
+void *hipd_omni_main(void *);
+void hipd_omni_cleanup(void);
+void hipd_omni_handoff(sockaddr_list *);
+char *hipd_omni_get_gateway(const char *);
+char *hipd_omni_get_ifname(void);
+
+#endif

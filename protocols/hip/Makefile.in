@@ -202,7 +202,7 @@ libhipl_libhipl_la_OBJECTS = $(am_libhipl_libhipl_la_OBJECTS)
 @HIP_PERFORMANCE_TRUE@am__EXEEXT_2 = test/performance/dh_performance$(EXEEXT)
 @HIP_FIREWALL_TRUE@am__EXEEXT_3 = hipfw/hipfw$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS) $(sbin_PROGRAMS)
-am_hipd_hipd_OBJECTS = hipd/main.$(OBJEXT) hipd/hipd_sine.$(OBJEXT)
+am_hipd_hipd_OBJECTS = hipd/main.$(OBJEXT) hipd/hipd_omni.$(OBJEXT)
 hipd_hipd_OBJECTS = $(am_hipd_hipd_OBJECTS)
 hipd_hipd_DEPENDENCIES = libhipl/libhipl.la
 am__objects_4 = hipfw/cache.$(OBJEXT) hipfw/cert.$(OBJEXT) \
@@ -499,7 +499,7 @@ test_performance_fw_port_bindings_performance_SOURCES = hipfw/file_buffer.c    \
 
 test_performance_hc_performance_SOURCES = test/performance/hc_performance.c
 tools_hipconf_SOURCES = tools/hipconf.c
-hipd_hipd_SOURCES = hipd/main.c hipd/hipd_sine.c
+hipd_hipd_SOURCES = hipd/main.c hipd/hipd_omni.c
 dist_sysconf_DATA = hipd/hipd.conf                                      \
                     hipd/hosts                                          \
                     hipd/relay.conf                                     \
@@ -1312,7 +1312,7 @@ mostlyclean-compile:
 	-rm -f android/ifaddrs.$(OBJEXT)
 	-rm -f android/ifaddrs.lo
 	-rm -f hipd/main.$(OBJEXT)
-	-rm -f hipd/hipd_sine.$(OBJEXT)
+	-rm -f hipd/hipd_omni.$(OBJEXT)
 	-rm -f hipfw/cache.$(OBJEXT)
 	-rm -f hipfw/cert.$(OBJEXT)
 	-rm -f hipfw/conntrack.$(OBJEXT)
@@ -1520,7 +1520,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/ifaddrs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@hipd/$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@hipd/$(DEPDIR)/hipd_sine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@hipd/$(DEPDIR)/hipd_omni.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/conntrack.Po@am__quote@

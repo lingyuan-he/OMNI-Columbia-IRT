@@ -94,7 +94,7 @@ test_performance_hc_performance_SOURCES   = test/performance/hc_performance.c
 
 tools_hipconf_SOURCES  = tools/hipconf.c
 
-hipd_hipd_SOURCES = hipd/main.c hipd/hipd_sine.c
+hipd_hipd_SOURCES = hipd/main.c hipd/hipd_omni.c
 
 dist_sysconf_DATA = hipd/hipd.conf                                      \
                     hipd/hosts                                          \
