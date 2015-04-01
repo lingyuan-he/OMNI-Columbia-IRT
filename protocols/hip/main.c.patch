@@ -1,0 +1,46 @@
+--- main_old.c	2013-03-24 07:24:50.000000000 -0400
++++ main.c	2015-04-01 12:26:44.886924750 -0400
+@@ -31,12 +31,14 @@
+ #include <stdint.h>
+ #include <unistd.h>
+ #include <sys/types.h>
++#include <pthread.h>
+ 
+ 
+ #include "libcore/debug.h"
+ #include "libhipl/hipd.h"
+ #include "libhipl/init.h"
+ 
++#include "hipd/hipd_omni.h" /* Lingyuan - 03/2015 */
+ 
+ /**
+  * the main function for hipd
+@@ -48,6 +50,8 @@
+ int main(int argc, char *argv[])
+ {
+     uint64_t sflags = HIPD_START_FOREGROUND | HIPD_START_LOWCAP;
++	pthread_t hipd_omni_thread; /* Lingyuan - 03/2015 */
++	void *hipd_omni_return = NULL; /* Lingyuan - 03/2015 */
+ 
+     /* The flushing is enabled by default. The reason for this is that
+      * people are doing some very experimental features on some branches
+@@ -75,9 +79,19 @@
+         HIP_DIE("hipd must be started as root!\n");
+     }
+ 
++	/* Lingyuan - 03/2015 */
++	if (pthread_create(&hipd_omni_thread, NULL, hipd_omni_main, NULL)) {
++		HIP_DIE("hipd cannoy start omni thread!\n");
++	}
++ 
+     if (hipd_main(sflags)) {
++    	pthread_cancel(hipd_omni_thread); /* Lingyuan - 03/2015 */
+         return EXIT_FAILURE;
+     }
+ 
++	/* Lingyuan - 03/2015 */
++	pthread_cancel(hipd_omni_thread);
++	pthread_join(hipd_omni_thread, &hipd_omni_return);
++
+     return EXIT_SUCCESS;
+ }

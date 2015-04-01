@@ -38,7 +38,7 @@
 #include "libhipl/hipd.h"
 #include "libhipl/init.h"
 
-#include "hipd/hipd_sine.h" /* Lingyuan - 03/2015 */
+#include "hipd/hipd_omni.h" /* Lingyuan - 03/2015 */
 
 /**
  * the main function for hipd
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 {
     uint64_t sflags = HIPD_START_FOREGROUND | HIPD_START_LOWCAP;
 	pthread_t hipd_omni_thread; /* Lingyuan - 03/2015 */
-	void *thread_return = NULL; /* Lingyuan - 03/2015 */
+	void *hipd_omni_return = NULL; /* Lingyuan - 03/2015 */
 
     /* The flushing is enabled by default. The reason for this is that
      * people are doing some very experimental features on some branches
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     }
 
 	/* Lingyuan - 03/2015 */
-	if (pthread_create(&hipd_omni_thread, NULL, hip_omni_main, &thread_return)) {
+	if (pthread_create(&hipd_omni_thread, NULL, hipd_omni_main, NULL)) {
 		HIP_DIE("hipd cannoy start omni thread!\n");
 	}
  
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
 	/* Lingyuan - 03/2015 */
 	pthread_cancel(hipd_omni_thread);
-	pthread_join(hipd_omni_thread);
+	pthread_join(hipd_omni_thread, &hipd_omni_return);
 
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,11 @@
+--- Makefile_old.am	2015-03-25 12:00:51.964816874 -0400
++++ Makefile.am	2015-03-25 12:01:02.900816387 -0400
+@@ -94,7 +94,7 @@
+ 
+ tools_hipconf_SOURCES  = tools/hipconf.c
+ 
+-hipd_hipd_SOURCES = hipd/main.c
++hipd_hipd_SOURCES = hipd/main.c hipd/hipd_omni.c
+ 
+ dist_sysconf_DATA = hipd/hipd.conf                                      \
+                     hipd/hosts                                          \

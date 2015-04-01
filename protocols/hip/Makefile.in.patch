@@ -1,0 +1,36 @@
+--- Makefile_old.in	2015-03-09 23:37:27.249119822 -0400
++++ Makefile.in	2015-04-01 12:19:23.574944426 -0400
+@@ -202,7 +202,7 @@
+ @HIP_PERFORMANCE_TRUE@am__EXEEXT_2 = test/performance/dh_performance$(EXEEXT)
+ @HIP_FIREWALL_TRUE@am__EXEEXT_3 = hipfw/hipfw$(EXEEXT)
+ PROGRAMS = $(noinst_PROGRAMS) $(sbin_PROGRAMS)
+-am_hipd_hipd_OBJECTS = hipd/main.$(OBJEXT)
++am_hipd_hipd_OBJECTS = hipd/main.$(OBJEXT) hipd/hipd_omni.$(OBJEXT)
+ hipd_hipd_OBJECTS = $(am_hipd_hipd_OBJECTS)
+ hipd_hipd_DEPENDENCIES = libhipl/libhipl.la
+ am__objects_4 = hipfw/cache.$(OBJEXT) hipfw/cert.$(OBJEXT) \
+@@ -499,7 +499,7 @@
+ 
+ test_performance_hc_performance_SOURCES = test/performance/hc_performance.c
+ tools_hipconf_SOURCES = tools/hipconf.c
+-hipd_hipd_SOURCES = hipd/main.c
++hipd_hipd_SOURCES = hipd/main.c hipd/hipd_omni.c
+ dist_sysconf_DATA = hipd/hipd.conf                                      \
+                     hipd/hosts                                          \
+                     hipd/relay.conf                                     \
+@@ -1312,6 +1312,7 @@
+ 	-rm -f android/ifaddrs.$(OBJEXT)
+ 	-rm -f android/ifaddrs.lo
+ 	-rm -f hipd/main.$(OBJEXT)
++	-rm -f hipd/hipd_omni.$(OBJEXT)
+ 	-rm -f hipfw/cache.$(OBJEXT)
+ 	-rm -f hipfw/cert.$(OBJEXT)
+ 	-rm -f hipfw/conntrack.$(OBJEXT)
+@@ -1519,6 +1520,7 @@
+ 
+ @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/ifaddrs.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@hipd/$(DEPDIR)/main.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@hipd/$(DEPDIR)/hipd_omni.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/cache.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/cert.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@hipfw/$(DEPDIR)/conntrack.Po@am__quote@

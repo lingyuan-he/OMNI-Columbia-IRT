@@ -6,23 +6,29 @@
 #ifndef _HIPD_OMNI_H_
 #define _HIPD_OMNI_H_
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <pthread.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include "libhipl/hidb.h"
 #include <sys/socket.h>
-#include <pthread.h>
+
 
 #define HIPD_OMNI_PORT 7776 /* port to listen */
 
-pthread_mutex_t hipd_omni_mutex; /* mutex for setting preference */
-char lsi_addr[INET_ADDRSTRLEN]; /* hip lsi address */
+//pthread_mutex_t hipd_omni_mutex; /* mutex for setting preference */
+//char lsi_addr[INET_ADDRSTRLEN]; /* hip lsi address */
 char hipd_omni_ifname[8]; /* current interface name */
 int hipd_omni_socket; /* socket fd */
 
-void *hipd_omni_main(void *);
-void hipd_omni_cleanup(void);
-void hipd_omni_handoff(sockaddr_list *);
-char *hipd_omni_get_gateway(const char *);
-char *hipd_omni_get_ifname(void);
+void *hipd_omni_main(void *); /* main function of the thread */
+void hipd_omni_cleanup(void *); /* cleanup when thread exits */
+int hipd_omni_switch(const char *); /* switch to another interface */
+char *hipd_omni_get_gateway(const char *); /* get gateway/router address by interface name */
+char *hipd_omni_get_ifname(void); /* get current interface name */
+void hipd_omni_update_ifname(void); /* update current interface name */
 
 #endif
