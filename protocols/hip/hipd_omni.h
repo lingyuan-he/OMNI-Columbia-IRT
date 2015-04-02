@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include "libhipl/hidb.h"
 #include <sys/socket.h>
+#include <errno.h>
 
 
 #define HIPD_OMNI_PORT 7776 /* port to listen */
@@ -30,5 +31,6 @@ int hipd_omni_switch(const char *); /* switch to another interface */
 char *hipd_omni_get_gateway(const char *); /* get gateway/router address by interface name */
 char *hipd_omni_get_ifname(void); /* get current interface name */
 void hipd_omni_update_ifname(void); /* update current interface name */
+int hipd_omni_check_ifname(const char *); /* check if an interface exists */
 
 #endif

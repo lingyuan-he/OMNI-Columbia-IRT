@@ -8,7 +8,7 @@
 /* cleanup when thread exits */
 void hipd_omni_cleanup(void *arg) {
 
-	HIP_DEBUG("hipd omni thread cleanup\n");
+	HIP_INFO("hipd omni thread cleanup\n");
 
 	if (arg == NULL) {
 		close(hipd_omni_socket);
@@ -18,7 +18,6 @@ void hipd_omni_cleanup(void *arg) {
 	//pthread_mutex_destroy(&hipd_omni_mutex);
 	close(hipd_omni_socket);
 	
-	//pthread_cleanup_pop(0);
 }
 
 /* update current interface name */
@@ -28,20 +27,24 @@ void hipd_omni_update_ifname(void) {
 
 	ifname = hipd_omni_get_ifname();
 	strcpy(hipd_omni_ifname, ifname);
+	HIP_INFO("hipd omni thread current interface %s\n", ifname);
 	free(ifname);
 }
 
 /* main function of the thread */
 void *hipd_omni_main(void *arg) {
 	struct sockaddr_in serv_addr, cli_addr;
-	fd_set rfds;
+	fd_set rfds, tmp_rfds;
 	int status;
 	unsigned int addrlen = sizeof(cli_addr);
 	char buf[256];
 	char result[256];
+	struct timeval timeout, timeout_tmp;
+
 	if (arg != NULL)
 		return NULL;
-	HIP_DEBUG("hipd omni thread init\n");
+		
+	HIP_INFO("hipd omni thread init\n");
 	
 	/* mutex init */
 	//pthread_mutex_init(&hipd_omni_mutex);
@@ -54,14 +57,14 @@ void *hipd_omni_main(void *arg) {
 	/* bind socket at the listening port */
 	hipd_omni_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (hipd_omni_socket < 0) {
-		HIP_DEBUG("hipd omni thread failed to init socket\n");
+		HIP_INFO("hipd omni thread failed to init socket\n");
 		return NULL;
 	}
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(HIPD_OMNI_PORT);
 	if (bind(hipd_omni_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-		HIP_DEBUG("hipd omni thread failed to bind socket\n");
+		HIP_INFO("hipd omni thread failed to bind socket\n");
 		return NULL;
 	}
 	
@@ -69,24 +72,36 @@ void *hipd_omni_main(void *arg) {
 	FD_ZERO(&rfds);
 	FD_SET(hipd_omni_socket, &rfds);
 	
-		/* main loop */
+	/* timeout */
+	timeout.tv_sec = 1;
+	timeout.tv_usec = 0; 
+	
+	/* main loop */
 	while (1) {
-		if (select(hipd_omni_socket + 1, &rfds, 0, 0, 0) < 0) {
-			HIP_DEBUG("hipd omni thread failed to select\n");
-			break;
+		/* fresh fd_set and timeout */
+		tmp_rfds = rfds;
+		timeout_tmp = timeout;
+		
+		/* select on socket */
+		if (select(hipd_omni_socket + 1, &tmp_rfds, NULL, NULL, &timeout_tmp) < 0) {
+			HIP_INFO("hipd omni thread failed to select: %s\n", strerror(errno));
+			if (errno == EINTR)
+				continue;
+			else
+				break;
 		}
 		
 		/* cancel point */
 		pthread_testcancel();
 		
 		/* we have new input */
-		if (FD_ISSET(hipd_omni_socket, &rfds)) {
+		if (FD_ISSET(hipd_omni_socket, &tmp_rfds)) {
 			buf[4] = '\0';	/* divide the message into two parts */
 			/* interface preference change */
 			if (strcmp(buf, "pref") == 0) {
-				HIP_DEBUG("hipd omni thread received preference\n");
+				HIP_INFO("hipd omni thread received preference\n");
 				if (strcmp(buf + 5, hipd_omni_ifname) == 0) {
-					HIP_DEBUG("hipd omni: already on %s\n", buf + 5);
+					HIP_INFO("hipd omni: already on %s\n", buf + 5);
 					strcpy(result, "0");
 				}
 				else {
@@ -95,14 +110,15 @@ void *hipd_omni_main(void *arg) {
 						sprintf(result, "%d", status);
 				}
 			} else {
-				HIP_DEBUG("hipd omni thread received unsupported command %s\n", buf);
+				HIP_INFO("hipd omni thread received unsupported command %s\n", buf);
 				strcpy(result, "-1");
 			}
 			/* feedback */
 			if (sendto(hipd_omni_socket, result, strlen(result), 0, (struct sockaddr *) &cli_addr, addrlen) < 0) {
-				HIP_DEBUG("hipd omni: failed to send back result");
+				HIP_INFO("hipd omni: failed to send back result");
 			}
-		}
+		} //else
+			//HIP_INFO("hipd omni thread received nothing\n");
 	}
 	
 	pthread_cleanup_pop(0);
@@ -113,36 +129,75 @@ void *hipd_omni_main(void *arg) {
 int hipd_omni_switch(const char *ifname) {
 	char cmd[100];
 	/* current gateway */
-	char *current_gw = hipd_omni_get_gateway(hipd_omni_ifname);
+	//char *current_gw = hipd_omni_get_gateway(hipd_omni_ifname);
 	/* new gateway */
-	char *new_gw = hipd_omni_get_gateway(ifname);
+	//char *new_gw = hipd_omni_get_gateway(ifname);
 	int status = 0;
 	
 	/* not found */
-	if (strcmp(new_gw, "0.0.0.0") == 0)
-		return -1;
+	//if (strcmp(new_gw, "0.0.0.0") == 0)
+		//return -1;
 	
 	/* drop previous gateway */
-	sprintf(cmd, "sudo route delete default gw %s %s", current_gw, hipd_omni_ifname);
-	status = system(cmd);
-	if (status < 0)
-		return -1;
+	//sHIP_INFO(cmd, "sudo ip route delete default gw %s %s", current_gw, hipd_omni_ifname);
+	//status = system(cmd);
+	//if (status < 0)
+		//return -1;
 	
 	/* use new gateway */
-	sprintf(cmd, "sudo route delete default gw %s %s", new_gw, ifname);
-	status = system(cmd);
-	if (status < 0)
-		return -1;
+	//sHIP_INFO(cmd, "sudo ip route delete default gw %s %s", new_gw, ifname);
+	//status = system(cmd);
+	//if (status < 0)
+		//return -1;
 	
 	/* free resources */
-	free(current_gw);
-	free(new_gw);
+	//free(current_gw);
+	//free(new_gw);
+
+	/* interface not exist */
+	if (hipd_omni_check_ifname(ifname) == 0)
+		return -1;
+	
+	/* replace default device */
+	sprintf(cmd, "sudo ip route replace default dev %s", ifname);
+	status = system(cmd);
+	
+	HIP_INFO("hipd omni thread replace default dev %s\n", ifname);
+	
+	if (status < 0)
+		return -1;
 	
 	return 0;
 }
 
+/* check if an interface exists */
+int hipd_omni_check_ifname(const char *ifname) {
+	
+	FILE *fp;
+	char str[10];
+
+	/* use netstat to grab interface names */
+	fp = popen("netstat -i | awk 'NR>=3 { print $1 }'", "r");
+	if (fp == NULL) {
+		HIP_INFO("hipd omni thread cannot execute netstat to check interface name\n");
+		return 0;
+	}
+	
+	/* read all lines and compare */
+	while (fscanf(fp, "%s", str) > 0) {
+		if (strcmp(str, ifname) == 0) {
+			fclose(fp);
+			HIP_INFO("hipd omni thread found interface %s\n", ifname);
+			return 1; /* found */
+		}
+	}
+	
+	fclose(fp);
+	return 0; /* not found */
+}
+
 /* get gateway/router address by interface name */
-char* hipd_omni_get_gateway(const char* ifname) {
+char* hipd_omni_get_gateway(const char *ifname) {
 	
 	char cmd[50];
 	char *str = (char *)malloc(sizeof(char) * 16);
@@ -152,12 +207,18 @@ char* hipd_omni_get_gateway(const char* ifname) {
 	/* get command */
 	sprintf(cmd, "arp -n -i %s | awk \'NR==2  { print $1}\'", ifname);
 
+	strcpy(str, "0.0.0.0"); /* 0.0.0.0 for all error or not found condition */
+	
 	/* execute route command, extract the correct row and then column, open output as file */
 	fp = popen(cmd, "r");
-	strcpy(str, "0.0.0.0"); /* 0.0.0.0 for all error or not found condition */
-	/* scan from result */
-	if (fscanf(fp, "%s", str) <= 0)
+	if (fp == NULL)
 		return str;
+	
+	/* scan from result */
+	if (fscanf(fp, "%s", str) <= 0) {
+		fclose(fp);
+		return str; /* no result */
+	}
 
 	fclose(fp);
 
@@ -169,16 +230,16 @@ char* hipd_omni_get_gateway(const char* ifname) {
 char *hipd_omni_get_ifname(void) {
 
 	/* execute one command to get gateway and ifname */
-	FILE *fp = popen("route -ne | awk \'NR>2 { print $2, $8 }\'", "r");
+	FILE *fp = popen("route -ne | awk \'NR>2 { print $1, $8 }\'", "r");
 	char str[20];
 	char *ifname = (char *)malloc(sizeof(char) * 8);
 	int found = 0;
 
 	/* read all entries */
 	while (fscanf(fp, "%s %s", str, ifname) > 0) {
-		printf("-%s-%s-\n", str, ifname);
+		HIP_INFO("-%s-%s-\n", str, ifname);
 		/* when ip part is not all 0 */
-		if (strcmp(str, "0.0.0.0") != 0) {
+		if (strcmp(str, "0.0.0.0") == 0) {
 			found = 1;
 			break;
 		}
