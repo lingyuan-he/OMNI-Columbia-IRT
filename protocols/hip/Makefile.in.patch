@@ -1,4 +1,4 @@
---- Makefile_old.in	2015-03-09 23:37:27.249119822 -0400
+--- Makefile.in	2015-03-09 23:37:27.249119822 -0400
 +++ Makefile.in	2015-04-01 12:19:23.574944426 -0400
 @@ -202,7 +202,7 @@
  @HIP_PERFORMANCE_TRUE@am__EXEEXT_2 = test/performance/dh_performance$(EXEEXT)
