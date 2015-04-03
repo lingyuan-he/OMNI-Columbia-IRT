@@ -8,7 +8,7 @@
 /* cleanup when thread exits */
 void hipd_omni_cleanup(void *arg) {
 
-	HIP_INFO("hipd omni thread cleanup\n");
+	HIP_INFO("hipd omni: thread cleanup\n");
 
 	if (arg == NULL) {
 		close(hipd_omni_socket);
@@ -27,7 +27,7 @@ void hipd_omni_update_ifname(void) {
 
 	ifname = hipd_omni_get_ifname();
 	strcpy(hipd_omni_ifname, ifname);
-	HIP_INFO("hipd omni thread current interface %s\n", ifname);
+	HIP_INFO("hipd omni: current interface is %s\n", ifname);
 	free(ifname);
 }
 
@@ -44,7 +44,7 @@ void *hipd_omni_main(void *arg) {
 	if (arg != NULL)
 		return NULL;
 		
-	HIP_INFO("hipd omni thread init\n");
+	HIP_INFO("hipd omni: thread init\n");
 	
 	/* mutex init */
 	//pthread_mutex_init(&hipd_omni_mutex);
@@ -57,14 +57,14 @@ void *hipd_omni_main(void *arg) {
 	/* bind socket at the listening port */
 	hipd_omni_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (hipd_omni_socket < 0) {
-		HIP_INFO("hipd omni thread failed to init socket\n");
+		HIP_INFO("hipd omni: failed to init socket, %s\n", strerror(errno));
 		return NULL;
 	}
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(HIPD_OMNI_PORT);
 	if (bind(hipd_omni_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-		HIP_INFO("hipd omni thread failed to bind socket\n");
+		HIP_INFO("hipd omni: failed to bind socket, %s\n", strerror(errno));
 		return NULL;
 	}
 	
@@ -84,7 +84,7 @@ void *hipd_omni_main(void *arg) {
 		
 		/* select on socket */
 		if (select(hipd_omni_socket + 1, &tmp_rfds, NULL, NULL, &timeout_tmp) < 0) {
-			HIP_INFO("hipd omni thread failed to select: %s\n", strerror(errno));
+			HIP_INFO("hipd omni: failed to select: %s\n", strerror(errno));
 			if (errno == EINTR)
 				continue;
 			else
@@ -96,10 +96,18 @@ void *hipd_omni_main(void *arg) {
 		
 		/* we have new input */
 		if (FD_ISSET(hipd_omni_socket, &tmp_rfds)) {
+
+			/* receive message */
+			if ((status = recvfrom(hipd_omni_socket, buf, 256, 0, (struct sockaddr *) &cli_addr, &addrlen)) < 0) {
+				HIP_INFO("hipd omni: failed to recvfrom: %s\n", strerror(errno));
+				break;
+			}
+
 			buf[4] = '\0';	/* divide the message into two parts */
+			
 			/* interface preference change */
 			if (strcmp(buf, "pref") == 0) {
-				HIP_INFO("hipd omni thread received preference\n");
+				HIP_INFO("hipd omni: received preference %s\n", buf + 5);
 				if (strcmp(buf + 5, hipd_omni_ifname) == 0) {
 					HIP_INFO("hipd omni: already on %s\n", buf + 5);
 					strcpy(result, "0");
@@ -110,17 +118,19 @@ void *hipd_omni_main(void *arg) {
 						sprintf(result, "%d", status);
 				}
 			} else {
-				HIP_INFO("hipd omni thread received unsupported command %s\n", buf);
+				HIP_INFO("hipd omni: received unsupported command %s\n", buf);
 				strcpy(result, "-1");
 			}
 			/* feedback */
 			if (sendto(hipd_omni_socket, result, strlen(result), 0, (struct sockaddr *) &cli_addr, addrlen) < 0) {
-				HIP_INFO("hipd omni: failed to send back result");
+				HIP_INFO("hipd omni: failed to send back result, %s", strerror(errno));
+				break;
 			}
 		} //else
 			//HIP_INFO("hipd omni thread received nothing\n");
 	}
 	
+	close(hipd_omni_socket);
 	pthread_cleanup_pop(0);
 	return NULL;
 }
@@ -162,7 +172,7 @@ int hipd_omni_switch(const char *ifname) {
 	sprintf(cmd, "sudo ip route replace default dev %s", ifname);
 	status = system(cmd);
 	
-	HIP_INFO("hipd omni thread replace default dev %s\n", ifname);
+	HIP_INFO("hipd omni: new default dev %s\n", ifname);
 	
 	if (status < 0)
 		return -1;
@@ -179,20 +189,21 @@ int hipd_omni_check_ifname(const char *ifname) {
 	/* use netstat to grab interface names */
 	fp = popen("netstat -i | awk 'NR>=3 { print $1 }'", "r");
 	if (fp == NULL) {
-		HIP_INFO("hipd omni thread cannot execute netstat to check interface name\n");
+		HIP_INFO("hipd omni: cannot execute netstat to check interface name, %s\n", strerror(errno));
 		return 0;
 	}
 	
 	/* read all lines and compare */
 	while (fscanf(fp, "%s", str) > 0) {
 		if (strcmp(str, ifname) == 0) {
-			fclose(fp);
-			HIP_INFO("hipd omni thread found interface %s\n", ifname);
+			pclose(fp);
+			HIP_INFO("hipd omni: found interface %s\n", ifname);
 			return 1; /* found */
 		}
 	}
 	
-	fclose(fp);
+	pclose(fp);
+HIP_INFO("hipd omni: does not found interface %s\n", ifname);
 	return 0; /* not found */
 }
 
