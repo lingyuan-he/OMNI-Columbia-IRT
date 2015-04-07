@@ -84,11 +84,10 @@ void *hipd_omni_main(void *arg) {
 		
 		/* select on socket */
 		if (select(hipd_omni_socket + 1, &tmp_rfds, NULL, NULL, &timeout_tmp) < 0) {
-			HIP_INFO("hipd omni: failed to select: %s\n", strerror(errno));
 			if (errno == EINTR)
 				continue;
-			else
-				break;
+			HIP_INFO("hipd omni: failed to select: %s\n", strerror(errno));
+			break;
 		}
 		
 		/* cancel point */
@@ -137,7 +136,7 @@ void *hipd_omni_main(void *arg) {
 
 /* switch to another interface */
 int hipd_omni_switch(const char *ifname) {
-	char cmd[100];
+	char arg[80];
 	/* current gateway */
 	//char *current_gw = hipd_omni_get_gateway(hipd_omni_ifname);
 	/* new gateway */
@@ -165,21 +164,68 @@ int hipd_omni_switch(const char *ifname) {
 	//free(new_gw);
 
 	/* interface not exist */
-	if (hipd_omni_check_ifname(ifname) == 0)
+	if (hipd_omni_check_ifname(ifname) == 0) {
+		HIP_INFO("hipd omni: failed to set new default dev %s, device not found\n", ifname);
 		return -1;
+	}
 	
 	/* replace default device */
-	sprintf(cmd, "sudo ip route replace default dev %s", ifname);
-	status = system(cmd);
+	sprintf(arg, "sudo ip route replace default dev %s", ifname);
+	//status = system(cmd);
+	//status = hipd_omni_sudo((const char *) arg);
 	
-	HIP_INFO("hipd omni: new default dev %s\n", ifname);
+	//status = system("id");
 	
+	/* do a fork to do sudo */
+	status = fork();
 	if (status < 0)
 		return -1;
+	else if (status > 0) {
+		/* parent wait for child */
+		wait(&status);
+	} else {
+		/* execute, return -1 on error */
+		status = setuid(0);
+		if (status < 0)
+			printf("%s\n", strerror(errno));
+		status = setgid(0);
+		if (status < 0)
+			printf("%s\n", strerror(errno));
+		status = system("id");
+		status = system(arg);
+		//execlp("sudo", "ip", "route", "replace", "default", "dev", ifname, (const char *) NULL);
+		exit(status);
+	}
 	
+	if (status < 0) {
+		HIP_INFO("hipd omni: failed to set new default dev %s, %s\n", ifname, strerror(errno));
+		return -1;
+	}
+	
+	HIP_INFO("hipd omni: new default dev %s\n", ifname);
 	return 0;
 }
 
+/* perform a sudo command */
+/*int hipd_omni_sudo(const char *arg) {
+	
+	int status = 0;
+	
+	 do a fork 
+	status = fork();
+	if (status < 0)
+		return -1;
+	else if (status > 0) {
+		 parent wait for child 
+		wait(&status);
+	} else {
+		 execute, return -1 on error 
+		execlp("sudo", arg);
+		exit(-1);
+	}
+	return status;
+}
+*/
 /* check if an interface exists */
 int hipd_omni_check_ifname(const char *ifname) {
 	

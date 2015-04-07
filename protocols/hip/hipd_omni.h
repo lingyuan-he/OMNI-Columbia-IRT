@@ -16,7 +16,8 @@
 #include "libhipl/hidb.h"
 #include <sys/socket.h>
 #include <errno.h>
-
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define HIPD_OMNI_PORT 7776 /* port to listen */
 
@@ -32,5 +33,6 @@ char *hipd_omni_get_gateway(const char *); /* get gateway/router address by inte
 char *hipd_omni_get_ifname(void); /* get current interface name */
 void hipd_omni_update_ifname(void); /* update current interface name */
 int hipd_omni_check_ifname(const char *); /* check if an interface exists */
+//int hipd_omni_sudo(const char *); /* perform a sudo command */
 
 #endif
