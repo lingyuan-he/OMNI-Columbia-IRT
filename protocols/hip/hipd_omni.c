@@ -5,15 +5,11 @@
 
 #include "hipd/hipd_omni.h"
 
-/* cleanup when thread exits */
-void hipd_omni_cleanup(void *arg) {
+/* cleanup when receive signal */
+void hipd_omni_cleanup(int signo) {
 
-	HIP_INFO("hipd omni: thread cleanup\n");
-
-	if (arg == NULL) {
-		close(hipd_omni_socket);
-		return;
-	}
+	HIP_INFO("hipd omni: receiving signal %d, terminating\n", signo);
+	
 	/* deallocate mutex and close socket */
 	//pthread_mutex_destroy(&hipd_omni_mutex);
 	close(hipd_omni_socket);
@@ -32,7 +28,7 @@ void hipd_omni_update_ifname(void) {
 }
 
 /* main function of the thread */
-void *hipd_omni_main(void *arg) {
+void hipd_omni_main(void) {
 	struct sockaddr_in serv_addr, cli_addr;
 	fd_set rfds, tmp_rfds;
 	int status;
@@ -40,16 +36,19 @@ void *hipd_omni_main(void *arg) {
 	char buf[256];
 	char result[256];
 	struct timeval timeout, timeout_tmp;
-
-	if (arg != NULL)
-		return NULL;
 		
-	HIP_INFO("hipd omni: thread init\n");
+	HIP_INFO("hipd omni: process init\n");
+	
+	/* SIGTERM handler */
+	if (signal(SIGTERM, hipd_omni_cleanup) == SIG_ERR) {
+		HIP_INFO("hipd omni: failed to setup handler for SIGERM\n");
+		return;
+	}
 	
 	/* mutex init */
 	//pthread_mutex_init(&hipd_omni_mutex);
 	
-	pthread_cleanup_push(hipd_omni_cleanup, NULL);
+	//pthread_cleanup_push(hipd_omni_cleanup, NULL);
 	
 	/* current interface */
 	hipd_omni_update_ifname();
@@ -58,14 +57,14 @@ void *hipd_omni_main(void *arg) {
 	hipd_omni_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (hipd_omni_socket < 0) {
 		HIP_INFO("hipd omni: failed to init socket, %s\n", strerror(errno));
-		return NULL;
+		return;
 	}
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(HIPD_OMNI_PORT);
 	if (bind(hipd_omni_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		HIP_INFO("hipd omni: failed to bind socket, %s\n", strerror(errno));
-		return NULL;
+		return;
 	}
 	
 	/* fd_set for select() call */
@@ -91,7 +90,7 @@ void *hipd_omni_main(void *arg) {
 		}
 		
 		/* cancel point */
-		pthread_testcancel();
+		//pthread_testcancel();
 		
 		/* we have new input */
 		if (FD_ISSET(hipd_omni_socket, &tmp_rfds)) {
@@ -125,13 +124,12 @@ void *hipd_omni_main(void *arg) {
 				HIP_INFO("hipd omni: failed to send back result, %s", strerror(errno));
 				break;
 			}
-		} //else
-			//HIP_INFO("hipd omni thread received nothing\n");
+		}
 	}
 	
 	close(hipd_omni_socket);
-	pthread_cleanup_pop(0);
-	return NULL;
+	//pthread_cleanup_pop(0);
+	return;
 }
 
 /* switch to another interface */
@@ -191,7 +189,7 @@ int hipd_omni_switch(const char *ifname) {
 		status = setgid(0);
 		if (status < 0)
 			printf("%s\n", strerror(errno));
-		status = system("id");
+		//status = system("id");
 		status = system(arg);
 		//execlp("sudo", "ip", "route", "replace", "default", "dev", ifname, (const char *) NULL);
 		exit(status);
@@ -206,26 +204,6 @@ int hipd_omni_switch(const char *ifname) {
 	return 0;
 }
 
-/* perform a sudo command */
-/*int hipd_omni_sudo(const char *arg) {
-	
-	int status = 0;
-	
-	 do a fork 
-	status = fork();
-	if (status < 0)
-		return -1;
-	else if (status > 0) {
-		 parent wait for child 
-		wait(&status);
-	} else {
-		 execute, return -1 on error 
-		execlp("sudo", arg);
-		exit(-1);
-	}
-	return status;
-}
-*/
 /* check if an interface exists */
 int hipd_omni_check_ifname(const char *ifname) {
 	
@@ -294,7 +272,7 @@ char *hipd_omni_get_ifname(void) {
 
 	/* read all entries */
 	while (fscanf(fp, "%s %s", str, ifname) > 0) {
-		HIP_INFO("-%s-%s-\n", str, ifname);
+		//HIP_INFO("-%s-%s-\n", str, ifname);
 		/* when ip part is not all 0 */
 		if (strcmp(str, "0.0.0.0") == 0) {
 			found = 1;
