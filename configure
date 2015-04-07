@@ -2,7 +2,7 @@
 
 # configuration script of OMNI project
 
-sudo apt-get install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake libtool bzr libnetfilter-queue-dev libssl-dev libnl-3-dev libnl-route-3-dev libnl-genl-3-dev
+sudo apt-get -y install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake libtool bzr libnetfilter-queue-dev libssl-dev libnl-3-dev libnl-route-3-dev libnl-genl-3-dev
 #libcurl4-openssl-dev perl-Net-IP perl-Net-DNS
 
 #raptor backward support
@@ -29,9 +29,18 @@ fi
 # hip
 pushd ./protocols/hip
 tar zxvf hipl-1.0.8.tar.gz
-pushd ./hipl-1.0.8
-./configure
-popd
+# omni source
+cp hipd_omni.c ./hipl-1.0.8/hipd
+cp hipd_omni.h ./hipl-1.0.8/hipd
+# patches
+cd ./hipl-1.0.8
+patch Makefile.in < ../Makefile.in.patch
+patch Makefile.am < ../Makefile.am.patch
+cd ./hipd
+patch main.c < ../../main.c.patch
+cd ../
+./configure LDFLAGS=-lpthread
+cd../
 popd
 
 # boost

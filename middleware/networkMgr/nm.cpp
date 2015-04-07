@@ -96,26 +96,33 @@ void sine_getIfStatus(const char* ifname, char* result)
 
 int sine_getCost(const char* ifname)
 {
-        char buf[20];
+	/* commented out for now since mih_usr is not returnning */
+
+        /*char buf[20];
         sprintf(buf, "c %s", ifname);
         if (ipc_nm(buf, -1) == NULL || buf[0] == '\0')
 	{
 		return INT_MAX;
 	}
 	//printf("%d\n", (int)buf[0]);
-	return atoi(buf);
+	return atoi(buf);*/
+	return 0;
 }
 
 int sine_getBandwidth(const char* ifname)
 {
         char buf[20];
+	
+	/* commented for now since mih_usr not returnning */
+/*
 	printf("\nQuery the network information (cost & bandwidth) from MIH.\n");
         sprintf(buf, "b %s", ifname);
         if (ipc_nm(buf, -1) == NULL || buf[0] == '\0')
 	{
 		return -1;
 	}
-	return atoi(buf);
+	return atoi(buf);*/
+	return 0;
 }
 
 char* sine_getInfo(const char* ifname)
@@ -142,10 +149,11 @@ void sine_confirmHipIf(int sockfd, const char* ifname)
 
 void sine_setMipIf(int sockfd, const char* ifname)
 {
-        char buf[20];
+	/* commented out since mip is not in use */
+        /*char buf[20];
 	printf("\nTell MIPv6 to use interface %s.\n", ifname);
         sprintf(buf, "m %s", ifname);
-        ipc_nm(buf, -1);
+        ipc_nm(buf, -1);*/
 }
 
 bool sine_appRegister(int sockfd)
