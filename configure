@@ -65,6 +65,25 @@ cp ./boost-build.jam ./odtone-0.6
 # mih usr source
 mv ./odtone-0.6/app/mih_usr/mih_usr.cpp ./odtone-0.6/app/mih_usr/mih_usr_backup.cpp 
 cp mih_usr.cpp ./odtone-0.6/app/mih_usr
+# config file
+tar zxvf dist.tar.gz
+cd dist/802_3
+ADDR=$(ip link list eth0 2>&1 | awk 'NR==2 { print $2 }')
+if [ ${#ADDR} == 17 ]; then
+	sed -i 's/link_addr = xx:xx:xx:xx:xx:xx/link_addr = '$ADDR'/' link_sap.conf
+else
+	echo 'Error: cannot find interface eth0'
+	exit 1
+fi
+cd ../802_11
+ADDR=$(ip link list wlan0 2>&1 | awk 'NR==2 { print $2 }')
+if [ ${#ADDR} == 17 ]; then
+	sed -i 's/link_addr = xx:xx:xx:xx:xx:xx/link_addr = '$ADDR'/' link_sap.conf
+else
+	echo 'Error: cannot find interface wlan0'
+	exit 1
+fi
+cd ../../
 popd
 
 # ip table
