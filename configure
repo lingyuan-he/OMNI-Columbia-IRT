@@ -52,8 +52,9 @@ then
 fi
 pushd ./protocols/mih/boost_1_48_0
 ./bootstrap.sh
-./b2
-sudo ./b2 install
+# ODTONE DOES NOT NEED LIBBOOST, JUST B2, SO WE DO NOT NEED TO COMPILE
+#./b2
+#sudo ./b2 install
 sudo cp b2 /usr/local/sbin/b2
 popd
 
@@ -83,7 +84,9 @@ else
 	echo 'Error: cannot find interface wlan0'
 	exit 1
 fi
-cd ../../
+cd ../
+cp -rf * ../odtone-0.6/dist
+cd ../
 popd
 
 # ip table
