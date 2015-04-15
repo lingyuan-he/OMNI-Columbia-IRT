@@ -8,19 +8,16 @@ TAR=tar
 RM=rm
 PWD=$(shell pwd)
 
-all: socks hip mih lm additional
+all: socks hip mih additional
 
 socks:
-	$(MAKE) -C ./middleware/
+	$(MAKE) -C ./middleware
 
 hip:
-	$(MAKE) -C ./protocols/hip/hipl-1.0.8/
+	$(MAKE) -C ./protocols/hip/hipl-1.0.8
 
 mih:
 	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) --boost-root=../boost_1_48_0 linkflags=-lpthread
-
-lm: ./middleware/locationMgr/locationMgr.cpp
-	$(CPP) ./middleware/locationMgr/locationMgr.cpp -o ./middleware/locationMgr/lm -lpthread 
 
 additional:
 	$(CD) ./protocols/mih/; $(CD) dist; $(CP) -r * ../odtone-0.6/dist; $(CD) ../;
@@ -37,7 +34,7 @@ install:
 	$(MAKE) install -C ./protocols/hip/hipl-1.0.8/
 
 clean:
-	$(MAKE) -C ./middleware/ clean
+	$(MAKE) -C ./middleware clean
 	$(MAKE) -C ./protocols/hip/hipl-1.0.8 clean
 	$(CD) ./protocols/mih/odtone-0.6; $(BJAM) clean
 
