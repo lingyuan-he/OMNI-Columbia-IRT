@@ -15,6 +15,7 @@ PWD=$(pwd)
 # empty for linux compilation
 TOOLSET=
 LDFLAGS=
+ANDROID=
 
 all: socks hip mih additional
 

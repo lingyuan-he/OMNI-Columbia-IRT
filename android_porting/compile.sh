@@ -24,6 +24,7 @@ sudo apt-get -y install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi binutils-arm
 # make install and work folder
 mkdir -p install
 mkdir -p install/odtone
+mkdir -p install/sined
 mkdir -p work
 
 # enter work folder

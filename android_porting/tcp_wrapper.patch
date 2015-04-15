@@ -1,0 +1,44 @@
+--- scaffold.c	1997-03-21 13:27:24.000000000 -0500
++++ scaffold.c	2015-04-15 15:08:25.376837790 -0400
+@@ -20,12 +20,13 @@
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #ifndef INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+ 
+-extern char *malloc();
++//extern char *malloc();
+ 
+ /* Application-specific. */
+ 
+--- Makefile	1997-03-21 13:27:21.000000000 -0500
++++ Makefile	2015-04-15 15:05:46.216844886 -0400
+@@ -359,6 +359,12 @@
+ 	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=environ.o \
+ 	NETGROUP= TLI= all
+ 
++# android cross compile
++android:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	ARFLAGS=rv EXTRA_CFLAGS="-DBROKEN_SO_LINGER" AUX_OBJ=setenv.o \
++	NETGROUP= TLI= all
++
+ ###############################################################
+ # System dependencies: TLI (transport-level interface) support.
+ # 
+ 
+--- percent_m.c	1994-12-28 11:42:37.000000000 -0500
++++ percent_m.c	2015-04-15 15:07:25.976840438 -0400
+@@ -14,7 +14,7 @@
+ 
+ extern int errno;
+ #ifndef SYS_ERRLIST_DEFINED
+-extern char *sys_errlist[];
++//extern char *sys_errlist[];
+ extern int sys_nerr;
+ #endif
+ 

@@ -69,3 +69,7 @@ make
 make install
 cd ../
 
+echo ""
+echo "Cross compilation for hipl is done"
+echo ""
+
