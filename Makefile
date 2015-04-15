@@ -30,7 +30,7 @@ install:
 	$(CP) ./middleware/srelay.conf /etc/srelay.conf
 	$(CP) ./middleware/sined /usr/local/sbin/sined
 	$(CP) ./middleware/kill_sined /usr/local/sbin/kill_sined
-	$(CP) ./middleware/locationMgr/lm /usr/local/sbin/lm
+	$(CP) ./middleware/locsw /usr/local/sbin/locsw
 	$(MAKE) install -C ./protocols/hip/hipl-1.0.8/
 
 clean:
