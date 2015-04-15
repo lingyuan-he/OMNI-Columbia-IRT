@@ -1,3 +1,7 @@
+# Unified Heterogeneous Networking Middleware
+# Main Makefile
+
+# commands
 CD=cd
 CP=cp
 GCC=gcc
@@ -6,7 +10,11 @@ BJAM=b2
 SED=sed
 TAR=tar
 RM=rm
-PWD=$(shell pwd)
+PWD=$(pwd)
+
+# empty for linux compilation
+TOOLSET=
+LDFLAGS=
 
 all: socks hip mih additional
 
