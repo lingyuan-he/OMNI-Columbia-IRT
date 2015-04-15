@@ -63,6 +63,7 @@ rm -rf dist
 cd odtone-$ODTONE_VER/dist
 cp -rf * ../../../install/odtone
 cd ../../../
+cp mih ./install/odtone
 
 echo ""
 echo "Cross compilation for odtone is done"
