@@ -10,7 +10,7 @@ BJAM=b2
 SED=sed
 TAR=tar
 RM=rm
-PWD=$(pwd)
+PWD=$(shell pwd)
 
 # empty for linux compilation
 TOOLSET=
