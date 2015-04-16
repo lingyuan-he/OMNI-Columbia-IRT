@@ -11,7 +11,7 @@ struct connection *last_connection;
 pthread_mutex_t mutex;
 int init_connection_tbl_status = 0;
 fpos_t pos; 
-const char str_status[6][7] = {"NEW", "SEND", "RECV", "CONNECT" , "LISTEN", "FIN"};
+char str_status[6][7] = {"NEW", "SEND", "RECV", "CONNECT" , "LISTEN", "FIN"};
 
 void init_connection_tbl() {
 
@@ -25,10 +25,10 @@ void init_connection_tbl() {
 		printf("Error init_connection_tbl");
 		return;
 	}
-	printf("Memory Loction of table %u\n", connection_tbl);
-	printf("Memory Loction of init record %u\n", connection_tbl[0]);
+	printf("Memory Loction of table %p\n", connection_tbl);
+	printf("Memory Loction of init record %p\n", connection_tbl[0]);
 	init_connection_tbl_status = 1;
-	printf("Size of connection : %d %d\n", sizeof(struct connection), sizeof(size_t));
+	printf("Size of connection : %lu %lu\n", sizeof(struct connection), sizeof(size_t));
 	printf("------------------------------\n");
 	printf("Initialized Connection Manager\n");
 	printf("------------------------------\n\n\n");
@@ -44,7 +44,7 @@ void add_connection(int sockfd, int app_guid){
 		printf("Error add_connection");
 		return;
 	}
-	printf("Memory Loction is %u\n", record);
+	printf("Memory Loction is %p\n", record);
 	record->sockfd = sockfd;
 	record->parent_sockfd = 0;
 	record->app_guid = app_guid;
@@ -63,7 +63,7 @@ void add_child_connection(int sockfd, int new_sockfd){
 		printf("Error add_connection");
 		return;
 	}
-	printf("Memory Loction is %u\n", record);
+	printf("Memory Loction is %p\n", record);
 	record->sockfd = new_sockfd;
 	record->parent_sockfd = sockfd;
 	record->app_guid = 31;

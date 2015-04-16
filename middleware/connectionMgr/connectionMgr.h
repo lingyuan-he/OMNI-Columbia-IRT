@@ -1,3 +1,5 @@
+#ifndef _CONNECTION_MGR_H_
+#define _CONNECTION_MGR_H_
 
 enum connection_status {
    NEW,
@@ -15,14 +17,18 @@ struct connection{
    int policy_guid;
    enum connection_status status;
    socklen_t addrlen;
-   struct sockaddr *addr;
+   const struct sockaddr *addr;
    struct connection *next;
 };
 
 void init_connection_tbl();
-int update_connection_bind(int sockfd, const void *addr, int addrlen);
-int update_connection_status(int sockfd, enum connection_status status);
-void add_connection(int sockfd, int app_guid);
-void add_child_connection(int sockfd, int new_sockfd);
+int update_connection_bind(int, const void *, int);
+int update_connection_status(int, enum connection_status);
+void add_connection(int, int);
+void add_child_connection(int, int);
 void print_connections();
-char * convert_status(enum connection_status status);
+char *convert_status(enum connection_status);
+void update_last_connection(struct connection *);
+
+#endif
+

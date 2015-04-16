@@ -10,6 +10,7 @@
 //#include <socks.h>
 #include "connectionMgr.h"
 #include "policy.h"
+#include "sine_socket.h"
 
 /* ToDo : Cleanup Variables */
 

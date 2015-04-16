@@ -1,21 +1,23 @@
+#ifndef _SINE_SOCKET_H_
+#define _SINE_SOCKET_H_
 
-int sine_socket (int af, int type, int protocol, int app_guid);
-int sine_bind (int s, const void *addr, int  addrlen);
-int sine_send(int s, void *msg, int len, int flags);
-int sine_connect(int s, void *addr, int  addrlen);
-int sine_getsockopt (int s, int  level, int optname, void *optval, int *optlen);
-int sine_select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-int sine_shutdown(int s, int how);
-int sine_close(int s);
-int sine_listen(int s, int backlog);
-int sine_recv(int s, void *buf, int len, int flags) ;
-int sine_accept(int s, void *addr, int *addrlen);
-int sine_setsockopt (int         s,
-                     int         level,
-                     int         optname,
-                     void       *optval,
-                     int         optlen);
+#include <sys/types.h>
 
+int sine_socket (int, int, int, int);
+int sine_bind (int, const void *, int);
+int sine_send(int, void *, int, int);
+int sine_connect(int, void *, int);
+int sine_getsockopt (int, int, int, void *, int *);
+int sine_select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+int sine_shutdown(int, int);
+int sine_close(int);
+int sine_listen(int, int);
+int sine_recv(int s, void *, int, int) ;
+int sine_accept(int, void *, int *);
+int sine_setsockopt(int, int, int, void *, int);
 void sine_kill(void);
-int sine_fcntl      (int fd);
+int sine_fcntl(int, int, int);
 void init_policy_engine();
+
+#endif
+
