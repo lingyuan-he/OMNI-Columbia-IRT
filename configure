@@ -52,8 +52,9 @@ then
 fi
 pushd ./protocols/mih/boost_1_48_0
 ./bootstrap.sh
-./b2
-sudo ./b2 install
+# ODTONE DOES NOT NEED LIBBOOST, JUST B2, SO WE DO NOT NEED TO COMPILE
+#./b2
+#sudo ./b2 install
 sudo cp b2 /usr/local/sbin/b2
 popd
 
@@ -65,6 +66,27 @@ cp ./boost-build.jam ./odtone-0.6
 # mih usr source
 mv ./odtone-0.6/app/mih_usr/mih_usr.cpp ./odtone-0.6/app/mih_usr/mih_usr_backup.cpp 
 cp mih_usr.cpp ./odtone-0.6/app/mih_usr
+# config file
+tar zxvf dist.tar.gz
+cd dist/802_3
+ADDR=$(ip link list eth0 2>&1 | awk 'NR==2 { print $2 }')
+if [ ${#ADDR} == 17 ]; then
+	sed -i 's/link_addr = xx:xx:xx:xx:xx:xx/link_addr = '$ADDR'/' link_sap.conf
+else
+	echo 'Error: cannot find interface eth0'
+	exit 1
+fi
+cd ../802_11
+ADDR=$(ip link list wlan0 2>&1 | awk 'NR==2 { print $2 }')
+if [ ${#ADDR} == 17 ]; then
+	sed -i 's/link_addr = xx:xx:xx:xx:xx:xx/link_addr = '$ADDR'/' link_sap.conf
+else
+	echo 'Error: cannot find interface wlan0'
+	exit 1
+fi
+cd ../
+cp -rf * ../odtone-0.6/dist
+cd ../
 popd
 
 # ip table

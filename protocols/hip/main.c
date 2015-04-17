@@ -31,8 +31,8 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <pthread.h>
-
+//#include <pthread.h>
+#include <signal.h>
 
 #include "libcore/debug.h"
 #include "libhipl/hipd.h"
@@ -50,8 +50,7 @@
 int main(int argc, char *argv[])
 {
     uint64_t sflags = HIPD_START_FOREGROUND | HIPD_START_LOWCAP;
-	pthread_t hipd_omni_thread; /* Lingyuan - 03/2015 */
-	void *hipd_omni_return = NULL; /* Lingyuan - 03/2015 */
+	int pid = 0, status = 0; /* Lingyuan - 04/2015 */
 
     /* The flushing is enabled by default. The reason for this is that
      * people are doing some very experimental features on some branches
@@ -79,19 +78,39 @@ int main(int argc, char *argv[])
         HIP_DIE("hipd must be started as root!\n");
     }
 
+	/* Lingyuan - 04/2015 */
+	/* fork into a new control process */
+	pid = fork();
+	if (pid < 0) {
+        HIP_DIE("hipd cannot fork the omni control process\n");
+    } else if (pid == 0) {
+    	/* control process */
+    	hipd_omni_main();
+    	exit(0);
+    }
+	
 	/* Lingyuan - 03/2015 */
-	if (pthread_create(&hipd_omni_thread, NULL, hipd_omni_main, NULL)) {
-		HIP_DIE("hipd cannoy start omni thread!\n");
-	}
+	//if (pthread_create(&hipd_omni_thread, NULL, hipd_omni_main, NULL)) {
+	//	HIP_DIE("hipd cannoy start omni thread!\n");
+	//}
  
     if (hipd_main(sflags)) {
-    	pthread_cancel(hipd_omni_thread); /* Lingyuan - 03/2015 */
+    	//pthread_cancel(hipd_omni_thread); /* Lingyuan - 03/2015 */
+    	/* Lingyuan - 04/2015 */
+        kill(pid, SIGTERM);
+		waitpid(pid, &status, 0);
         return EXIT_FAILURE;
     }
 
-	/* Lingyuan - 03/2015 */
-	pthread_cancel(hipd_omni_thread);
-	pthread_join(hipd_omni_thread, &hipd_omni_return);
+	/* Lingyuan - 04/2015 */
+	HIP_INFO("hipd terminating omni process\n");
+	//pthread_cancel(hipd_omni_thread);
+	//pthread_join(hipd_omni_thread, &hipd_omni_return);
+	/* sending terminate signal and wait for child to terminate */
+	kill(pid, SIGTERM);
+	waitpid(pid, &status, 0);
+
+	HIP_INFO("hipd exit\n");
 
     return EXIT_SUCCESS;
 }

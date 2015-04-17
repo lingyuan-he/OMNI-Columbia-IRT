@@ -29,7 +29,7 @@ int main(void) {
 		strcat(str, str2);
 		if (strcmp(str, "exit") == 0)
 			break;
-		sendto(socketfd, str, strlen(str), 0, (struct sockaddr *) &dest_addr, addrlen);
+		sendto(socketfd, str, strlen(str) + 1, 0, (struct sockaddr *) &dest_addr, addrlen);
 		printf("%d =%s=\n", (int) strlen(str), str);
 	}
 	
