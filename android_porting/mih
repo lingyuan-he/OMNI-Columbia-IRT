@@ -26,14 +26,14 @@ clean
 # installation folder on android device
 INSTALL_DIR=/data/misc/install
 
-cd $ROOT_DIR/odtone
+cd $INSTALL_DIR/odtone
 
 #run odtone-mihf, mih_usr and three link_saps
 ./odtone-mihf 1> output &
 sleep 1
-cd 802_3
-../link_sap 1> output &
-cd ../802_11
+#cd 802_3
+#../link_sap 1> output &
+cd 802_11
 ../link_sap 1> output &
 cd ../lte
 ../link_sap 1> output &
