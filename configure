@@ -52,8 +52,7 @@ then
 fi
 pushd ./protocols/mih/boost_1_48_0
 ./bootstrap.sh
-# ODTONE DOES NOT NEED LIBBOOST, JUST B2, SO WE DO NOT NEED TO COMPILE
-#./b2
+./b2
 #sudo ./b2 install
 sudo cp b2 /usr/local/sbin/b2
 popd

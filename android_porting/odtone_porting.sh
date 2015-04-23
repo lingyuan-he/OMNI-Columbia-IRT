@@ -30,11 +30,11 @@ cd tools/build/v2
 cat >> user-config.jam <<EOF
 using gcc : arm : ${TOOLCHAIN}g++ :
 <compileflags>-I${INSTALL_PATH}/include
-<linkflags>-L${INSTALL_PATH}/lib ;
+<linkflags>"-Wl,--whole-archive -lpthread -Wl, --no-whole-archive -lc -L${INSTALL_PATH}/lib" ;
 EOF
 cd ../../../
-# ODTONE DOES NOT NEED LIBBOOST, JUST B2, SO WE DO NOT NEED TO COMPILE
-#./b2 target-os=linux toolset=gcc-arm
+# libboost
+./b2 target-os=linux toolset=gcc-arm
 cd ../
 
 # odtone
