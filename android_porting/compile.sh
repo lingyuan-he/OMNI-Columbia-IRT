@@ -12,6 +12,7 @@ HOST=arm-none-linux
 
 # software version
 OPENSSL_VER=1.0.2a
+ZLIB_VER=1.2.8
 
 echo ""
 echo "This script will compile odtone, hipl and middlware into 'install' folder"
@@ -43,7 +44,18 @@ make
 make install
 cd ../
 
-# back to work
+# zlib, common dependency
+if [ ! -f zlib-$ZLIB_VER.tar.gz ]; then
+	wget http://zlib.net/zlib-$ZLIB_VER.tar.gz
+fi
+tar zxvf zlib-$ZLIB_VER.tar.gz
+cd zlib-$ZLIB_VER
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH
+make
+make install
+cd ../
+
+# back to main porting folder
 cd ../
 
 # odtone

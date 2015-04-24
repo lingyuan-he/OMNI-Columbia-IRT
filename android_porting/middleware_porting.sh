@@ -11,23 +11,11 @@ BUILD=x86_64-unknown-linux-gnu
 HOST=arm-none-linux
 
 # software version
-ZLIB_VER=1.2.8
 CURL_VER=7.41.0
 WRAPPER_VER=7.6
 
 # work folder
 cd work
-
-# zlib
-if [ ! -f zlib-$ZLIB_VER.tar.gz ]; then
-	wget http://zlib.net/zlib-$ZLIB_VER.tar.gz
-fi
-tar zxvf zlib-$ZLIB_VER.tar.gz
-cd zlib-$ZLIB_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH
-make
-make install
-cd ../
 
 # tcp wrapper
 if [ ! -f tcp_wrappers_$WRAPPER_VER.tar.gz ]; then
