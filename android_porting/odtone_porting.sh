@@ -31,6 +31,7 @@ sed -i -e "s/CC=gcc/CC=${TOOLCHAIN}gcc/g" Makefile
 sed -i -e "s/AR=ar/AR=${TOOLCHAIN}ar/g" Makefile
 sed -i -e "s/RANLIB=ranlib/RANLIB=${TOOLCHAIN}ranlib/g" Makefile
 sed -i -e "s|PREFIX=/usr/local|PREFIX=${INSTALL_PATH}|g" Makefile
+sed -i -e "s|CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)|CFLAGS=-Wall -Winline -O2 -g -static $(BIGFILES)|g" Makefile
 make
 make install
 cd ../
@@ -52,10 +53,11 @@ using gcc : arm : /usr/bin/${TOOLCHAIN}g++ :
 EOF
 cd ../../../
 # libboost
-./b2 target-os=linux toolset=gcc-arm
+./b2 target-os=linux toolset=gcc-arm link=static
 ./b2 install
 cd ../
 sleep 30
+
 # odtone
 # copy archives
 cp ../../protocols/mih/odtone-$ODTONE_VER.tar.gz ./
@@ -71,7 +73,7 @@ sed -i -e 's/boost-minor = 49/boost-minor = ${BOOST_MINOR}/g' Jamroot
 echo "boost-build ../${BOOST_NAME}/tools/build/v2 ;" > boost-build.jam
 # build
 #../${BOOST_NAME}/bjam linkflags=-lpthread
-../${BOOST_NAME}/b2 --boost-root=../${BOOST_NAME} linkflags="-lpthread -L${INSTALL_PATH}/lib"
+../${BOOST_NAME}/b2 --boost-root=../${BOOST_NAME} link=static linkflags="-lpthread -L${INSTALL_PATH}/lib"
 # link_sap configs
 cd ../
 tar zxvf dist.tar.gz
@@ -79,6 +81,7 @@ cd dist
 cp -rf * ../odtone-$ODTONE_VER/dist
 cd ../
 rm -rf dist
+
 # copy all in dist to install
 cd odtone-$ODTONE_VER/dist
 cp -rf * ../../../install/odtone

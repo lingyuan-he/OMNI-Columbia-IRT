@@ -24,9 +24,14 @@ sudo apt-get -y install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi binutils-arm
 
 # make install and work folder
 mkdir -p install
+mkdir -p install/lib
 mkdir -p install/odtone
 mkdir -p install/sined
 mkdir -p work
+
+# copy pre-built libraries
+cp /usr/arm-linux-gnueabi/lib/*.a ./install/lib
+cp /usr/arm-linux-gnueabi/lib/libc.so ./install/lib
 
 # enter work folder
 cd work
@@ -37,7 +42,7 @@ if [ ! -f openssl-$OPENSSL_VER.tar.gz ]; then
 fi
 tar zxvf openssl-$OPENSSL_VER.tar.gz
 cd openssl-$OPENSSL_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./config shared no-asm no-ssl2 no-ssl3 no-comp no-hw no-engine --prefix=$INSTALL_PATH
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./config no-shared no-asm no-ssl2 no-ssl3 no-comp no-hw no-engine --prefix=$INSTALL_PATH
 sed 's/-m64//g' -i Makefile # The arm compiler doesn't support -m64
 make clean
 make
@@ -50,7 +55,7 @@ if [ ! -f zlib-$ZLIB_VER.tar.gz ]; then
 fi
 tar zxvf zlib-$ZLIB_VER.tar.gz
 cd zlib-$ZLIB_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH --static
 make
 make install
 cd ../

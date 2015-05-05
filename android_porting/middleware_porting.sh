@@ -35,7 +35,7 @@ if [ ! -f curl-$CURL_VER.tar.gz ]; then
 fi
 tar zxvf curl-$CURL_VER.tar.gz
 cd curl-$CURL_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm CPPFLAGS=-I$INSTALL_PATH/include LDFLAGS=-L$INSTALL_PATH/lib LIBS="-lz -lssl -lcrypto" ./configure --prefix=$INSTALL_PATH --host=$HOST
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm CPPFLAGS=-I$INSTALL_PATH/include LDFLAGS=-L$INSTALL_PATH/lib LIBS="-lz -lssl -lcrypto" ./configure --prefix=$INSTALL_PATH --host=$HOST --disable-share
 make
 make install
 cd ../
@@ -48,7 +48,7 @@ cd ./srelay/srelay-0.4.8b5
 ./configure
 cd ../../
 # compile
-TOOLSET=${TOOLCHAIN} LDFLAGS="-L${INSTALL_PATH}/lib -L/usr/arm-linux-gnueabi/lib"  ANDROID="-I${INSTALL_PATH}/include" make
+TOOLSET=${TOOLCHAIN} LDFLAGS="-L${INSTALL_PATH}/lib"  ANDROID="-I${INSTALL_PATH}/include -static" make
 # copy output
 cp sined ../../install/sined
 cp kill_sined ../../install/sined
