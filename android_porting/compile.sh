@@ -55,7 +55,7 @@ if [ ! -f zlib-$ZLIB_VER.tar.gz ]; then
 fi
 tar zxvf zlib-$ZLIB_VER.tar.gz
 cd zlib-$ZLIB_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH --static
+CC=${TOOLCHAIN}gcc LD=${TOOLCHAIN}ld AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH --static
 make
 make install
 cd ../

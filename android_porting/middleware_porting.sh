@@ -13,6 +13,7 @@ HOST=arm-none-linux
 # software version
 CURL_VER=7.41.0
 WRAPPER_VER=7.6
+ZLIB_VER=1.2.8
 
 # work folder
 cd work
@@ -35,7 +36,7 @@ if [ ! -f curl-$CURL_VER.tar.gz ]; then
 fi
 tar zxvf curl-$CURL_VER.tar.gz
 cd curl-$CURL_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm CPPFLAGS=-I$INSTALL_PATH/include LDFLAGS=-L$INSTALL_PATH/lib LIBS="-lz -lssl -lcrypto" ./configure --prefix=$INSTALL_PATH --host=$HOST --disable-share
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm CPPFLAGS=-I$INSTALL_PATH/include LDFLAGS=-L$INSTALL_PATH/lib LIBS="-lz -lssl -lcrypto" ./configure --prefix=$INSTALL_PATH --host=$HOST --enable-shared=no --enable-static=yes --with-zlib=$INSTALL_PATH/work/zlib-$ZLIB_VER
 make
 make install
 cd ../
