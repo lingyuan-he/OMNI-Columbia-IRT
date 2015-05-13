@@ -2,9 +2,9 @@
 
 # Unified Heterogeneous Networking Middleware
 # Android Cross Compile - Compile Odtone
-# Lingyuan He / Dhruv Kuchhal - 04/2015
+# Lingyuan He - 05/2015
 
-# for cross compile
+# cross compile variables
 INSTALL_PATH=$(pwd)/install
 TOOLCHAIN_FOLDER=$(pwd)/toolchain
 TOOLCHAIN=$TOOLCHAIN_FOLDER/bin/arm-linux-androideabi-
@@ -54,7 +54,7 @@ tar zxvf Boost-for-Android-master.tar.gz
 cd Boost-for-Android-master
 
 # patch to add r10 32-bit NDK support
-patch -p0 < ../../patch/boost-for-android/build-android.sh.patch
+patch -p0 < ../../patches/boost-for-android/build-android.sh.patch
 
 # build without python (unnecessary) to avoid 32/64-bit python mix-up
 ./build-android.sh --boost=$BOOST_VER --prefix=$INSTALL_PATH --toolchain=arm-linux-androideabi-$NDK_GCC $NDK_ROOT --without-libraries=python
@@ -92,10 +92,10 @@ fi
 cd ../../../../../odtone-$ODTONE_VER
 
 # patch debug backtrace code
-patch -N ./lib/odtone/debug_linux.cpp < ../../patch/odtone/debug_linux.cpp.patch
+patch -N ./lib/odtone/debug_linux.cpp < ../../patches/odtone/debug_linux.cpp.patch
 
 # patch link_sap
-patch -N ./app/link_sap/linux/main.cpp < ../../patch/odtone/main.cpp.patch
+patch -N ./app/link_sap/linux/main.cpp < ../../patches/odtone/main.cpp.patch
 
 # librt (-lrt) is built into libc (-lc) in android, no need to link it explicitly
 sed -i -e 's|<toolset>gcc-android:<linkflags>"-lrt"||g' ./app/link_sap/Jamfile
@@ -105,7 +105,7 @@ sed -i -e 's|<toolset>gcc:<linkflags>"-lrt"||g' ./app/link_sap/Jamfile
 PATH=$TOOLCHAIN_FOLDER/bin:$PATH
 
 # compile use toolset rule set by boost for android
-../Boost-for-Android-master/${BOOST_NAME}/b2 --boost-root=../Boost-for-Android-master/${BOOST_NAME} toolset=gcc-android #link=static
+../Boost-for-Android-master/${BOOST_NAME}/b2 --boost-root=../Boost-for-Android-master/${BOOST_NAME} toolset=gcc-android link=static
 
 # link_sap configs
 cd ../

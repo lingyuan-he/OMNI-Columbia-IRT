@@ -4,10 +4,6 @@
 # Android Cross Compile - Main Script
 # Lingyuan He - 05/2015
 
-# for cross compile
-INSTALL_PATH=$(pwd)/install
-TOOLCHAIN=$(pwd)/toolchain/bin/arm-linux-androideabi-
-
 echo ""
 echo "This script will compile odtone, hipl and middlware for Android into 'install' folder"
 echo ""
@@ -18,19 +14,19 @@ mkdir -p install/sine
 mkdir -p toolchain
 
 # NDK config
-./ndk_config.sh
+./scripts/ndk_config.sh
 
 # build common dependencies
-./common_build.sh
+./scripts/common_build.sh
 
 # build odtone
-./odtone_build.sh
+./scripts/odtone_build.sh
 
 # build hipl
-./hipl_build.sh
+./scripts/hipl_build.sh
 
 # build middleware
-./middleware_build.sh
+./scripts/middleware_build.sh
 
 echo ""
 echo "Do not forget to change interface MAC address in 'install/odtone/802_11/link_sap.conf' and 'install/odtone/lte/link_sap.conf'"

@@ -4,7 +4,7 @@
 # Android Cross Compile - Compile Middleware
 # Lingyuan He - 05/2015
 
-# for cross compile
+# cross compile variables
 INSTALL_PATH=$(pwd)/install
 TOOLCHAIN_FOLDER=$(pwd)/toolchain
 TOOLCHAIN=$TOOLCHAIN_FOLDER/bin/arm-linux-androideabi-
@@ -28,7 +28,7 @@ tar zxvf tcp_wrappers_$WRAPPER_VER.tar.gz
 cd tcp_wrappers_$WRAPPER_VER
 
 # apply patch to fix compilation error and add cross compilation support
-patch -p0 < ../../patch/tcp_wrappers/tcp_wrappers.patch
+patch -p0 < ../../patches/tcp_wrappers/tcp_wrappers.patch
 CC=${TOOLCHAIN}gcc RANLIB=${TOOLCHAIN}ranlib make REAL_DAEMON_DIR=./ android
 cp libwrap.a ../../install/lib
 cp tcpd.h ../../install/include
@@ -60,13 +60,13 @@ cd ./srelay/srelay-0.4.8b5
 ./configure
 
 # patch crypt() usage and unnecessary lib
-patch -p0 < ../../../../patch/middleware/auth-pwd.c.patch
-patch -p0 < ../../../../patch/middleware/Makefile.srelay.patch
+patch -p0 < ../../../../patches/middleware/auth-pwd.c.patch
+patch -p0 < ../../../../patches/middleware/Makefile.srelay.patch
 cd ../../
-patch -p0 < ../../patch/middleware/Makefile.main.patch
+patch -p0 < ../../patches/middleware/Makefile.main.patch
 
 # compile
-TOOLSET=${TOOLCHAIN} LDFLAGS=-L${INSTALL_PATH}/lib  ANDROID=-I${INSTALL_PATH}/include make # -static
+TOOLSET=${TOOLCHAIN} LDFLAGS=-L${INSTALL_PATH}/lib  ANDROID="-static -I${INSTALL_PATH}/include" make
 
 # copy output
 cp sined ../../install/sine

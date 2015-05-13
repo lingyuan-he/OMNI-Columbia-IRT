@@ -4,8 +4,6 @@
 # Android Cross Compile - Common Dependency
 # Lingyuan He - 05/2015
 
-# compile common dependencies
-
 # cross compile variables
 INSTALL_PATH=$(pwd)/install
 TOOLCHAIN=$(pwd)/toolchain/bin/arm-linux-androideabi-

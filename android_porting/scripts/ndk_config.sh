@@ -4,8 +4,6 @@
 # Android Cross Compile - NDK Configuration
 # Lingyuan He - 05/2015
 
-# download, configure and patch NDK
-
 # toolchain variables
 TOOLCHAIN_FOLDER=$(pwd)/toolchain
 TOOLCHAIN_SYSROOT=$TOOLCHAIN_FOLDER/sysroot
@@ -34,13 +32,13 @@ $NDK_ROOT/build/tools/make-standalone-toolchain.sh --toolchain=arm-linux-android
 
 # patch toolchain
 # HIPL - add definition for __fswab64 needed by libnetfilter_queue
-patch -N $TOOLCHAIN_SYSROOT/usr/include/linux/byteorder/swab.h < ../patch/ndk/swab.h.patch
+patch -N $TOOLCHAIN_SYSROOT/usr/include/linux/byteorder/swab.h < ../patches/ndk/swab.h.patch
 # HIPL - add some deprecated stuff back to netinet/ip.h
-patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/ip.h < ../patch/ndk/ip.h.patch
+patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/ip.h < ../patches/ndk/ip.h.patch
 # HIPL - add the icmphdr definition to netinet/ip_icmp.h
-patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/ip_icmp.h < ../patch/ndk/ip_icmp.h.patch
+patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/ip_icmp.h < ../patches/ndk/ip_icmp.h.patch
 # ODTONE - ICMP6_FILTER definition
-patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/icmp6.h < ../patch/ndk/icmp6.h.patch
+patch -N $TOOLCHAIN_SYSROOT/usr/include/netinet/icmp6.h < ../patches/ndk/icmp6.h.patch
 
 echo ""
 echo "NDK Version $NDK_VERSION is prepared and patched"
