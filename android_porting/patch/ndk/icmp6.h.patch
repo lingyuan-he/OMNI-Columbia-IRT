@@ -1,0 +1,11 @@
+--- icmp6.h	2014-07-09 03:08:57.000000000 -0400
++++ icmp6.h	2015-05-10 23:04:13.955458622 -0400
+@@ -88,6 +88,8 @@
+ #define icmp6_seq	icmp6_data16[1]		/* echo request/reply */
+ #define icmp6_maxdelay	icmp6_data16[0]		/* mcast group membership */
+ 
++#define ICMP6_FILTER 1
++
+ #define ICMP6_DST_UNREACH		1	/* dest unreachable, codes: */
+ #define ICMP6_PACKET_TOO_BIG		2	/* packet too big */
+ #define ICMP6_TIME_EXCEEDED		3	/* time exceeded, code: */

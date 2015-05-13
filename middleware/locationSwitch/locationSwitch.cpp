@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -50,7 +51,7 @@ void *query_handler (void *arg)
 	std::vector<client_info>* p_applist = (std::vector<client_info>*)arg;
 
         int len;
-        unsigned int addrlen = sizeof(cli_addr);
+        socklen_t addrlen = sizeof(cli_addr);
         char buf[256];
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);

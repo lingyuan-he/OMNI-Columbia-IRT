@@ -1,0 +1,20 @@
+--- Makefile	2015-04-15 15:20:03.000000000 -0400
++++ Makefile	2015-05-12 20:10:03.976070751 -0400
+@@ -22,7 +22,7 @@
+ 
+ CPPFLAGS = -I./protocolMgr -I./connectionMgr -I./policyMgr -I./networkMgr -I./locationMgr -I./srelay/srelay-0.4.8b5 $(ANDROID)
+ 
+-LIBS = -lpthread -lcrypt -lcurl -lwrap -lz -lssl -lcrypto
++LIBS = -lcurl -lwrap -lz -lssl -lcrypto
+ 
+ default: all
+ 
+@@ -30,7 +30,7 @@
+ 	$(CXX) $(CPPFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+ 
+ locsw: ./locationSwitch/locationSwitch.cpp
+-	$(CXX) $(CPPFLAGS) $(LDFLAGS) ./locationSwitch/locationSwitch.cpp -lpthread -o locsw
++	$(CXX) $(CPPFLAGS) $(LDFLAGS) ./locationSwitch/locationSwitch.cpp -o locsw
+ 
+ all: $(TARGET) locsw
+ 

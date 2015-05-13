@@ -1,6 +1,8 @@
 #ifndef _CONNECTION_MGR_H_
 #define _CONNECTION_MGR_H_
 
+#include <sys/socket.h>
+
 enum connection_status {
    NEW,
    SEND,

@@ -175,6 +175,8 @@ int serv_loop()
 #endif
 
   for (;;) {
+  	msg_out(norm, "in server loop\n");
+  
     readable = allsock;
 
     MUTEX_LOCK(mutex_select);
@@ -339,6 +341,7 @@ int serv_loop()
     }
 #endif
   }
+  msg_out(norm, "out server loop\n");
 }
 
 int inetd_service(int cs)

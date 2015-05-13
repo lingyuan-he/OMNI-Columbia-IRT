@@ -2,23 +2,11 @@
 
 # configuration script of OMNI project
 
+# dependencies
+# you may need ia32-libs when running on a 64-bit machine
 sudo apt-get -y install make gcc g++ build-essential libxml2-dev libbz2-dev python-dev librdf0-dev indent flex bison libwrap0-dev autoconf automake libtool bzr libnetfilter-queue-dev libssl-dev libnl-3-dev libnl-route-3-dev libnl-genl-3-dev
-#libcurl4-openssl-dev perl-Net-IP perl-Net-DNS
 
-#raptor backward support
-if [ ! -f "/usr/include/rasqal.h" ]
-then
-	sudo ln -s /usr/include/rasqal/rasqal.h /usr/include/rasqal.h
-fi
-if [ ! -f "/usr/include/raptor.h" ]
-then
-	sudo ln -s /usr/include/raptor2/raptor.h /usr/include/raptor.h
-fi
-if [ ! -f "/usr/include/raptor2.h" ]
-then
-	sudo ln -s /usr/include/raptor2/raptor2.h /usr/include/raptor2.h
-fi
-
+# pre-configure srelay
 if [ ! -f "./middleware/srelay/srelay-0.4.8b5/Makefile" ]
 then
 	pushd "./middleware/srelay/srelay-0.4.8b5"

@@ -1,0 +1,32 @@
+--- auth-pwd.c	2015-05-12 20:54:18.035952422 -0400
++++ auth-pwd.c	2015-05-12 20:58:35.239940955 -0400
+@@ -37,8 +37,8 @@
+ #include <pwd.h>
+ #elif  SOLARIS
+ #include <shadow.h>
+-#include <crypt.h>
+ #endif
++#include <openssl/des.h> /* have to use Openssl for password hashing in Android */
+ 
+ #define TIMEOUTSEC    30
+ 
+@@ -225,7 +225,8 @@
+     return(0);
+   }
+   if (*pwd->pw_passwd) {
+-    if (strcmp(pwd->pw_passwd, crypt(pass, pwd->pw_passwd)) == 0) {
++  	/* use DES_crypt in OpenSSL for Android */
++    if (strcmp(pwd->pw_passwd, DES_crypt(pass, pwd->pw_passwd)) == 0) {
+       matched = 1;
+     }
+   }
+@@ -244,7 +245,8 @@
+     return(0);
+   }
+   if (*spwd->sp_pwdp) {
+-    if (strcmp(spwd->sp_pwdp, crypt(pass, spwd->sp_pwdp)) == 0) {
++  	/* use DES_crypt in OpenSSL for Android */
++    if (strcmp(pwd->pw_passwd, DES_crypt(pass, spwd->sp_pwdp)) == 0) {
+       matched = 1;
+     }
+   }

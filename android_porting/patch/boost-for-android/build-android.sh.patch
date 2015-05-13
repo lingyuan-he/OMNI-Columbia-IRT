@@ -1,0 +1,14 @@
+--- build-android.sh	2015-01-31 10:55:28.000000000 -0500
++++ build-android.sh	2015-05-09 14:28:48.766461794 -0400
+@@ -262,6 +262,11 @@
+ 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+ 		TOOLSET=gcc-androidR8e
+ 		;;
++	"10"|"10b"|"10c"|"10d")
++		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.9}
++		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86/bin/arm-linux-androideabi-g++
++		TOOLSET=gcc-androidR8e
++		;;
+ 	*)
+ 		echo "Undefined or not supported Android NDK version!"
+ 		exit 1

@@ -1,0 +1,158 @@
+--- scaffold.c	1997-03-21 13:27:24.000000000 -0500
++++ scaffold.c	2015-04-15 15:08:25.376837790 -0400
+@@ -20,12 +20,13 @@
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #ifndef INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+ 
+-extern char *malloc();
++//extern char *malloc();
+ 
+ /* Application-specific. */
+ 
+--- Makefile	1997-03-21 13:27:21.000000000 -0500
++++ Makefile	2015-04-15 15:05:46.216844886 -0400
+@@ -359,6 +359,12 @@
+ 	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=environ.o \
+ 	NETGROUP= TLI= all
+ 
++# android cross compile
++android:
++	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
++	ARFLAGS=rv EXTRA_CFLAGS="-DBROKEN_SO_LINGER" AUX_OBJ=setenv.o \
++	NETGROUP= TLI= all
++
+ ###############################################################
+ # System dependencies: TLI (transport-level interface) support.
+ # 
+ 
+--- percent_m.c	1994-12-28 11:42:37.000000000 -0500
++++ percent_m.c	2015-05-11 23:22:03.433854422 -0400
+@@ -12,9 +12,7 @@
+ #include <errno.h>
+ #include <string.h>
+ 
+-extern int errno;
+ #ifndef SYS_ERRLIST_DEFINED
+-extern char *sys_errlist[];
+ extern int sys_nerr;
+ #endif
+ 
+@@ -29,11 +27,7 @@
+ 
+     while (*bp = *cp)
+ 	if (*cp == '%' && cp[1] == 'm') {
+-	    if (errno < sys_nerr && errno > 0) {
+-		strcpy(bp, sys_errlist[errno]);
+-	    } else {
+-		sprintf(bp, "Unknown error %d", errno);
+-	    }
++	    strcpy(bp, strerror(errno));
+ 	    bp += strlen(bp);
+ 	    cp += 2;
+ 	} else {
+
+--- hosts_access.c	1997-02-11 20:13:23.000000000 -0500
++++ hosts_access.c	2015-05-11 22:34:50.425980729 -0400
+@@ -35,7 +35,6 @@
+ #include <string.h>
+ 
+ extern char *fgets();
+-extern int errno;
+ 
+ #ifndef	INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+
+--- workarounds.c	1996-03-19 10:22:26.000000000 -0500
++++ workarounds.c	2015-05-11 23:03:28.033904151 -0400
+@@ -22,8 +22,6 @@
+ #include <syslog.h>
+ #include <string.h>
+ 
+-extern int errno;
+-
+ #include "tcpd.h"
+ 
+  /*
+
+--- tli.c	1997-03-21 13:27:26.000000000 -0500
++++ tli.c	2015-05-11 23:31:03.205830356 -0400
+@@ -39,9 +39,6 @@
+ #include <string.h>
+ 
+ extern char *nc_sperror();
+-extern int errno;
+-extern char *sys_errlist[];
+-extern int sys_nerr;
+ extern int t_errno;
+ extern char *t_errlist[];
+ extern int t_nerr;
+@@ -305,12 +302,8 @@
+ 	    return (t_errlist[t_errno]);
+ 	}
+     } else {
+-	if (errno < 0 || errno >= sys_nerr) {
+-	    sprintf(buf, "Unknown UNIX error %d", errno);
++		sprintf(buf, "Unknown UNIX error %d", errno);
+ 	    return (buf);
+-	} else {
+-	    return (sys_errlist[errno]);
+-	}
+     }
+ }
+ 
+--- tli-sequent.c	1994-12-28 11:42:51.000000000 -0500
++++ tli-sequent.c	2015-05-11 23:33:19.373824285 -0400
+@@ -157,12 +157,8 @@
+ 	    return (t_errlist[t_errno]);
+ 	}
+     } else {
+-	if (errno < 0 || errno >= sys_nerr) {
+-	    sprintf(buf, "Unknown UNIX error %d", errno);
++		sprintf(buf, "Unknown UNIX error %d", errno);
+ 	    return (buf);
+-	} else {
+-	    return (sys_errlist[errno]);
+-	}
+     }
+ }
+ 
+--- inetcf.c	1997-02-11 20:13:24.000000000 -0500
++++ inetcf.c	2015-05-11 23:38:15.277811093 -0400
+@@ -15,7 +15,6 @@
+ #include <errno.h>
+ #include <string.h>
+ 
+-extern int errno;
+ extern void exit();
+ 
+ #include "tcpd.h"
+
+--- options.c	1996-02-11 11:01:32.000000000 -0500
++++ options.c	2015-05-11 23:52:40.217772530 -0400
+@@ -254,7 +254,7 @@
+ 
+     if ((grp = getgrnam(value)) == 0)
+ 	tcpd_jump("unknown group: \"%s\"", value);
+-    endgrent();
++    //endgrent();
+ 
+     if (dry_run == 0 && setgid(grp->gr_gid))
+ 	tcpd_jump("setgid(%s): %m", value);
+
+--- tcpdchk.c	1997-02-11 20:13:25.000000000 -0500
++++ tcpdchk (copy).c	2015-05-11 23:53:52.817769293 -0400
+@@ -31,7 +31,6 @@
+ #include <netdb.h>
+ #include <string.h>
+ 
+-extern int errno;
+ extern void exit();
+ extern int optind;
+ extern char *optarg;
+

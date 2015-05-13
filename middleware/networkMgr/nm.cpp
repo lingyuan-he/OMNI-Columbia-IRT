@@ -4,6 +4,7 @@
  * @date: Apr 16, 2012
  */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <iostream>
 #include <cstdlib>
@@ -22,8 +23,8 @@ char* ipc_nm(char* buf, int listener_sock)
 	int sockfd;
 	struct sockaddr_in nm_addr;
 	struct timeval tv;
-	unsigned int addrlen;
-	unsigned int buflen;
+	socklen_t addrlen;
+	int buflen;
 
 	//char* buf = malloc(20);
 

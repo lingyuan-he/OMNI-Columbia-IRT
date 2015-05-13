@@ -2,16 +2,13 @@
 
 # Unified Heterogeneous Networking Middleware
 # Android Cross Compile - HIP for Linux
-# Lingyuan He - 04/2015
+# Lingyuan He - 05/2015
 
-# for cross compile
+# cross compile variables
 INSTALL_PATH=$(pwd)/install
-TOOLCHAIN=arm-linux-gnueabi-
-BUILD=x86_64-unknown-linux-gnu
-HOST=arm-none-linux
-
-# compiler and tool
-#CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm
+TOOLCHAIN_FOLDER=$(pwd)/toolchain
+TOOLCHAIN=$TOOLCHAIN_FOLDER/bin/arm-linux-androideabi-
+HOST=arm-linux
 
 # software version
 LIBMNL_VER=1.0.3
@@ -29,7 +26,7 @@ fi
 bzip2 -dk libmnl-$LIBMNL_VER.tar.bz2
 tar xvf libmnl-$LIBMNL_VER.tar
 cd libmnl-$LIBMNL_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include -static" LDFLAGS=-L$INSTALL_PATH/lib
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include" LDFLAGS="-L$INSTALL_PATH/lib" #-static
 make
 make install
 cd ../
@@ -41,7 +38,7 @@ fi
 bzip2 -dk libnfnetlink-$LIBNFNETLINK_VER.tar.bz2
 tar xvf libnfnetlink-$LIBNFNETLINK_VER.tar
 cd libnfnetlink-$LIBNFNETLINK_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include -static" LDFLAGS=-L$INSTALL_PATH/lib
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include" LDFLAGS="-L$INSTALL_PATH/lib" #-static
 make
 make install
 cd ../
@@ -53,10 +50,15 @@ fi
 bzip2 -dk libnetfilter_queue-$LIBNETFILTER_VER.tar.bz2
 tar xvf libnetfilter_queue-$LIBNETFILTER_VER.tar
 cd libnetfilter_queue-$LIBNETFILTER_VER
-PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure  --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include -static" LDFLAGS=-L$INSTALL_PATH/lib
+# use patch from HIP
+patch -N src/extra/tcp.c < ../../patch/libnetfilter_queue/tcp.c.patch
+PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure  --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include" LDFLAGS="-L$INSTALL_PATH/lib" #-static
 make
 make install
 cd ../
+
+
+# hipl
 
 # copy hipl and decompress
 cp ../../protocols/hip/hipl-$HIPL_VER.tar.gz ./
@@ -64,7 +66,7 @@ tar zxvf hipl-$HIPL_VER.tar.gz
 
 # compile hipl
 cd hipl-$HIPL_VER
-PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig LDFLAGS=-L$INSTALL_PATH/lib CPPFLAGS="-I$INSTALL_PATH/include -static" LIBS="-ldl -lmnl -lnfnetlink -lnetfilter_queue" CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar ARD=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --prefix=$INSTALL_PATH --host=$HOST
+PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH ANDROID_SYSROOT=$TOOLCHAIN_FOLDER/sysroot LDFLAGS=-L$INSTALL_PATH/lib CFLAGS="-I$INSTALL_PATH/include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_N -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall -fPIC" CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --enable-android --disable-android-pie --host=$HOST --prefix=$INSTALL_PATH/hipl #-static
 make
 make install
 cd ../

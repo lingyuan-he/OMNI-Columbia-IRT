@@ -4,6 +4,7 @@
 	Location Manager and Network Manager.
 */
 
+#include <unistd.h>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>

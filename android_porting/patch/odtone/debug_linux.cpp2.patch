@@ -1,0 +1,96 @@
+--- debug_linux.cpp	2015-05-10 22:53:57.731486096 -0400
++++ debug_linux (copy).cpp	2015-05-10 22:52:47.759489216 -0400
+@@ -23,12 +23,18 @@
+ #include <cstdio>
+ #include <cstring>
+ #include <limits.h>
+-#include <execinfo.h>
+ #include <signal.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ 
++/* BEGIN - for Android */
++#include <iostream>
++#include <iomanip>
++#include <unwind.h>
++#include <dlfcn.h>
++/* END */
++
+ ///////////////////////////////////////////////////////////////////////////////
+ namespace {
+ 
+@@ -534,9 +540,61 @@
+ 	}
+ }
+ 
++/* BEGIN - use unwind to capture backtrace in Android instead of non-standard backtrace() */
++struct BacktraceState
++{
++    void** current;
++    void** end;
++};
++
++static _Unwind_Reason_Code unwind_callback(struct _Unwind_Context* context, void* arg)
++{
++    BacktraceState* state = static_cast<BacktraceState*>(arg);
++    uintptr_t pc = _Unwind_GetIP(context);
++    if (pc) {
++        if (state->current == state->end) {
++            return _URC_END_OF_STACK;
++        } else {
++            *state->current++ = reinterpret_cast<void*>(pc);
++        }
++    }
++    return _URC_NO_REASON;
++}
++
++
++size_t capture_backtrace(void** buffer, size_t max)
++{
++    BacktraceState state = {buffer, buffer + max};
++    _Unwind_Backtrace(unwind_callback, &state);
++
++    return state.current - buffer;
++}
++
++void dump_backtrace(void** buffer, size_t count)
++{
++	if (count > 0)
++		std::cerr << "\n== stack trace ==\n";
++    for (size_t idx = 0; idx < count; ++idx) {
++        const void* addr = buffer[idx];
++        const char* symbol = "";
++
++        Dl_info info;
++        if (dladdr(addr, &info) && info.dli_sname) {
++            symbol = info.dli_sname;
++        }
++
++        std::cerr << "  #" << std::setw(2) << idx << ": " << addr << "  " << symbol << "\n";
++    }
++}
++/* END */
++
+ void dump_stack(module_list& ml, void* address)
+ {
+-	void* trace[128];
++	/* use new solution */
++    void* buffer[128];
++	dump_backtrace(buffer, capture_backtrace(buffer, 128));
++	
++	/*void* trace[128];
+ 	int cnt, j, i = 0;
+ 	module* m;
+ 
+@@ -558,9 +616,8 @@
+ 				std::fprintf(stderr, "%02u %016lX\n", i - j, ulong(trace[i]));
+ 			++i;
+ 		}
+-	}
++	}*/
+ }
+-
+ ///////////////////////////////////////////////////////////////////////////////
+ } /* namespace */
+ 

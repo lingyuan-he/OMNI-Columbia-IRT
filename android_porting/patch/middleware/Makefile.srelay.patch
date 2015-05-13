@@ -1,0 +1,11 @@
+--- Makefile	2015-05-12 16:55:20.448591653 -0400
++++ Makefile	2015-05-12 18:17:18.964372364 -0400
+@@ -15,7 +15,7 @@
+ CPPFLAGS= 
+ DEFS	= -DHAVE_CONFIG_H -DSYSCONFDIR=\"$(sysconfdir)\"
+ LDFLAGS	=  -pthread
+-LIBS	= -lcrypt -lwrap -L/usr/local/lib 
++LIBS	= -lwrap
+ INCLUDES=
+ OBJS	= init.o readconf.o util.o socks.o relay.o main.o \
+ 		auth-pwd.o get-bind.o

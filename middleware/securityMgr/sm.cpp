@@ -366,7 +366,7 @@ bool sine_hip_encrypt(int encrypt_enable)
         int sockfd;
         int n;
         int i;
-        unsigned int len;
+        socklen_t len;
         struct sockaddr_in serv_addr;
         struct timeval tv;
         //odtone::mih::octet_string cmd;

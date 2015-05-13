@@ -1538,7 +1538,7 @@ int lookup_tbl(SOCKS_STATE *state)
     name[state->sr.dest.len_fqdn] = '\0';
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
-	msg_out("resolve name: %s", name);	//yan - debug
+	msg_out(norm, "resolve name: %s", name);	//yan - debug
     error = getaddrinfo(name, NULL, &hints, &res0);
 
     if ( !error ) {
