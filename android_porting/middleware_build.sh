@@ -69,9 +69,9 @@ patch -p0 < ../../patch/middleware/Makefile.main.patch
 TOOLSET=${TOOLCHAIN} LDFLAGS=-L${INSTALL_PATH}/lib  ANDROID=-I${INSTALL_PATH}/include make # -static
 
 # copy output
-cp sined ../../install/sined
-cp kill_sined ../../install/sined
-cp locsw ../../install/sined
+cp sined ../../install/sine
+cp kill_sined ../../install/sine
+cp locsw ../../install/sine
 
 
 echo ""

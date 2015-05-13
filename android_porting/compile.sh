@@ -14,29 +14,29 @@ echo ""
 
 # make install and work folder
 mkdir -p install/hipl
-mkdir -p install/sined
+mkdir -p install/sine
 mkdir -p toolchain
 
 # NDK config
-./ndk.sh
+./ndk_config.sh
 
-# common dependencies
-./common.sh
+# build common dependencies
+./common_build.sh
 
-# odtone
-./odtone_porting.sh
+# build odtone
+./odtone_build.sh
 
-# hipl
-./hipl_porting.sh
+# build hipl
+./hipl_build.sh
 
-# middleware
-./middleware_porting.sh
+# build middleware
+./middleware_build.sh
 
 echo ""
 echo "Do not forget to change interface MAC address in 'install/odtone/802_11/link_sap.conf' and 'install/odtone/lte/link_sap.conf'"
 echo ""
-echo "If you will push the install forlder somewhere else than /data/misc, do not forget to change INSTALL_PATH in install/odtone/mih script"
+echo "If you will push the install forlder somewhere else than '/data/misc' on Android, do not forget to change INSTALL_PATH in 'install/odtone/mih' script"
 echo ""
-echo "All done, please push 'install' folder up to android device"
+echo "All done, please push 'install/odtone', 'install/hipl' and 'install/sine' folder up to android device"
 echo ""
 
