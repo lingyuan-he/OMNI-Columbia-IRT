@@ -9,7 +9,7 @@ INSTALL_PATH=$(pwd)/install
 TOOLCHAIN=$(pwd)/toolchain/bin/arm-linux-androideabi-
 
 echo ""
-echo "This script will compile odtone, hipl and middlware into 'install' folder"
+echo "This script will compile odtone, hipl and middlware for Android into 'install' folder"
 echo ""
 
 # make install and work folder
