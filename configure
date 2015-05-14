@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# configuration script of OMNI project
+# Unified Heterogeneous Networking Middleware
+# Main Configuration File
+
+# software version
+ODTONE_VER=0.6
+HIPL_VER=1.0.8
+BOOST_VER_DOT=1.48.0
+BOOST_VER_USCORE=1_48_0
 
 # dependencies
 # you may need ia32-libs when running on a 64-bit machine
@@ -16,44 +23,43 @@ fi
 
 # hip
 pushd ./protocols/hip
-tar zxvf hipl-1.0.8.tar.gz
+tar zxvf hipl-$HIPL_VER.tar.gz
 # omni source
-cp hipd_omni.c ./hipl-1.0.8/hipd
-cp hipd_omni.h ./hipl-1.0.8/hipd
+cp hipd_omni.c ./hipl-$HIPL_VER/hipd
+cp hipd_omni.h ./hipl-$HIPL_VER/hipd
 # patches
-cd ./hipl-1.0.8
+cd ./hipl-$HIPL_VER
 patch Makefile.in < ../Makefile.in.patch
 patch Makefile.am < ../Makefile.am.patch
 cd ./hipd
 patch main.c < ../../main.c.patch
 cd ../
 ./configure LDFLAGS=-lpthread
-cd../
+cd ../
 popd
 
 # boost
-if [ ! -d "./protocols/mih/boost_1_48_0" ]
+if [ ! -d "./protocols/mih/boost_${BOOST_VER_USCORE}" ]
 then
-	wget http://downloads.sourceforge.net/project/boost/boost/1.48.0/boost_1_48_0.tar.gz -P ./protocols/mih/
-	tar -C ./protocols/mih -zxvf ./protocols/mih/boost_1_48_0.tar.gz
-	rm ./protocols/mih/boost_1_48_0.tar.gz
+	wget http://downloads.sourceforge.net/project/boost/boost/$BOOST_VER_DOT/boost_$BOOST_VER_USCORE.tar.gz -P ./protocols/mih/
+	tar -C ./protocols/mih -zxvf ./protocols/mih/boost_$BOOST_VER_USCORE.tar.gz
+	rm ./protocols/mih/boost_$BOOST_VER_USCORE.tar.gz
 fi
-pushd ./protocols/mih/boost_1_48_0
+pushd ./protocols/mih/boost_$BOOST_VER_USCORE
 ./bootstrap.sh
 ./b2
-#sudo ./b2 install
-sudo cp b2 /usr/local/sbin/b2
+sudo ./b2 install
 popd
 
 # mih
 pushd ./protocols/mih
-tar zxvf odtone-0.6.tar.gz
+tar zxvf odtone-$ODTONE_VER.tar.gz
 # boost build file
-cp ./boost-build.jam ./odtone-0.6
+cp ./boost-build.jam ./odtone-$ODTONE_VER
 # mih usr source
-mv ./odtone-0.6/app/mih_usr/mih_usr.cpp ./odtone-0.6/app/mih_usr/mih_usr_backup.cpp 
-cp mih_usr.cpp ./odtone-0.6/app/mih_usr
-# config file
+mv ./odtone-$ODTONE_VER/app/mih_usr/mih_usr.cpp ./odtone-$ODTONE_VER/app/mih_usr/mih_usr_backup.cpp 
+cp mih_usr.cpp ./odtone-$ODTONE_VER/app/mih_usr
+# config file, dynamically detect wireless and ethernet MAC address
 tar zxvf dist.tar.gz
 cd dist/802_3
 ADDR=$(ip link list eth0 2>&1 | awk 'NR==2 { print $2 }')
@@ -72,15 +78,9 @@ else
 	exit 1
 fi
 cd ../
-cp -rf * ../odtone-0.6/dist
+# put the config files in place
+mkdir -p ../odtone-$ODTONE_VER/dist
+cp -rf * ../odtone-$ODTONE_VER/dist
 cd ../
 popd
-
-# ip table
-if [ -z `grep -r sine /etc/iproute2/rt_tables` ]
-then
-	cp /etc/iproute2/rt_tables ./
-	echo -e "#sine\n200\thip0\n201\teth0\n202\twlan0\n203\tppp0\n204\tsixxs\n205\the-ipv6\n252\tmipv6\n" >> rt_tables
-	sudo mv rt_tables /etc/iproute2/rt_tables
-fi
 
