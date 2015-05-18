@@ -41,7 +41,7 @@ sed -i -e "s|CC=gcc|CC=${TOOLCHAIN}gcc|g" Makefile
 sed -i -e "s|AR=ar|AR=${TOOLCHAIN}ar|g" Makefile
 sed -i -e "s|RANLIB=ranlib|RANLIB=${TOOLCHAIN}ranlib|g" Makefile
 sed -i -e "s|PREFIX=/usr/local|PREFIX=${INSTALL_PATH}|g" Makefile
-sed -i -e "s|CFLAGS=-Wall -Winline -O2 -g \$(BIGFILES)|CFLAGS=-Wall -Winline -O2 -g \$(BIGFILES)|g" Makefile #-static
+sed -i -e "s|CFLAGS=-Wall -Winline -O2 -g \$(BIGFILES)|CFLAGS=-Wall -Winline -O2 -g \$(BIGFILES)|g" Makefile
 make
 make install
 cd ../
@@ -105,7 +105,7 @@ sed -i -e 's|<toolset>gcc:<linkflags>"-lrt"||g' ./app/link_sap/Jamfile
 PATH=$TOOLCHAIN_FOLDER/bin:$PATH
 
 # compile use toolset rule set by boost for android
-../Boost-for-Android-master/${BOOST_NAME}/b2 --boost-root=../Boost-for-Android-master/${BOOST_NAME} toolset=gcc-android link=static
+../Boost-for-Android-master/${BOOST_NAME}/b2 --boost-root=../Boost-for-Android-master/${BOOST_NAME} toolset=gcc-android
 
 # link_sap configs
 cd ../
@@ -120,6 +120,10 @@ cd odtone-$ODTONE_VER/dist
 cp -rf * ../../../install/odtone
 cd ../../../
 
+# mih_test
+cd test
+{$TOOLCHAIN}gcc -o mih_test mih_test.c
+cp mih_test ../install/odtone
 
 echo ""
 echo "Cross compilation for ODTONE is done"

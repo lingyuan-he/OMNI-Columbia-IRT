@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/system/bin/sh
 
 # Unified Heterogeneous Networking Middleware
 # Android - MIH Starting Script
@@ -6,16 +6,16 @@
 
 #clean all the daemon processes
 function clean {
-	for p in "mih_usr" "odtone-mihf" "link_sap"; do # "miis_rdf_server"; do
+	for p in "mih_usr" "odtone-mihf" "link_sap"; do
         	while true; do
-                	echo "ps ax | grep $p$ | awk '{print \$1}'"
-                	id="$(ps ax | grep $p$ | awk '{print $1}')"
+                	echo "ps | grep $p$ | awk '{print \$2}'"
+                	id="$(ps | grep $p$ | awk '{print $2}')"
                 	if [ -z  $id ]; then
                         	echo "no process named $p"
                         	break
                		else
 				echo -e "kill $id\t($p)"
-				sudo kill $id
+				kill $id
                         	echo "killed"
                 	fi
         	done

@@ -1,0 +1,211 @@
+Unified Heterogeneous Networking Middleware
+Android Cross Compile - Readme on Kernel Modification
+Lingyuan He - 05/2015
+
+
+(1) Prepare for the Work
+
+First install the dependenies in android_porting, including adb and fastboot:
+==========
+cd android_porting
+./dependency
+==========
+
+Then Add device USB rules, clone the repo and follow the Readme to add rules to udev:
+==========
+git clone https://code.google.com/p/51-android/
+cd 51-android
+==========
+
+Make sure your device is connected to your host with both adb and fastboot. Remember to enable USB debug in Developer option, and plug in your device.
+
+==========
+adb devices
+(accept RSA fingerprint if prompted, and device should show)
+adb reboot bootloader
+(proceed to fastboot mode)
+fastboot devices
+(should show device)
+==========
+
+
+(2) Download correct kernel source
+
+First check your Android device codename:
+http://www.droidviews.com/list-of-android-device-codenames/
+(Example: Nexus 7 is flo)
+
+
+Reference Google 'Building Kernel' guidlines:
+https://source.android.com/source/building-kernels.html
+
+
+Here is an example of Nexus 7 (flo):
+
+==========
+git clone https://android.googlesource.com/kernel/msm
+(kernel/msm is in 'source location')
+cd msm
+(initially empty, need to checkout a bracnh)
+git branch -a
+(list all branches)
+git checkout android-msm-flo-3.4-kitkat-mr2
+(choose the branch of correct Android version kitkat and codename flo)
+==========
+
+
+(3) Obtain Toolchain
+
+We will need the bare-metal arm-eabi toolcahin, which Google prebuilt for us.
+
+==========
+cd ../
+(now you are back to 'kernel' folder)
+git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/
+(toolchain in 'arm-eabi-4.6' folder)
+==========
+
+In the development, a newer toolchain 4.8 does not work with the kernel version, emitting errors.
+
+
+(4) Environment Variables
+
+Note you need to put full path for CROSS_COMPILE:
+==========
+cd msm
+export ARCH=arm
+export SUBARCH=arm
+export CROSS_COMPILE=/path/to/OMNI-Columbia-IRT/android_porting/kernel/arm-eabi-4.6/bin/arm-eabi-
+==========
+
+These are essential for kernel configuration and building.
+
+
+(5) Configure Kernel
+
+We need to select configuration, and add kernel module as required.
+
+==========
+make hammerhead_defconfig
+(kernel pre-config, hammerhead_defconfig is in 'build configuration'
+make menuconfig
+(this will start interactive kernel configuration)
+==========
+
+In the configuration menu, enable the following (taken from HIPL document):
+- Enable loadable module support
+- Networking support > Networking options > IP: IPsec BEET mode
+- Device drivers > Network device support > Dummy net driver support
+- Cryptographic API > Null algorithms
+
+Select Exit and answer Yes to save configuration.
+
+
+(6) Make Kernel
+
+==========
+make
+==========
+
+Kernel image will be compiled to: msm/arch/arm/boot/zImage
+
+
+(7) Prepare Boot Image Tools
+
+First compiling boot image compile tool from Google. Many commands reference to: https://gist.github.com/jberkel/1087757.
+
+==========
+cd ../
+(to 'kernel' folder)
+git clone https://android.googlesource.com/platform/system/core.git
+(getting core android lib and utils)
+cd core/libmincrypt/
+gcc -c *.c -I../include
+ar rcs libmincrypt.a  *.o
+cd ../mkbootimg
+gcc mkbootimg.c -o mkbootimg -std=c99 -I../include ../libmincrypt/libmincrypt.a
+==========
+
+Now you have mkbootimg utility in core/mkbootimg
+
+We include an unpack tool, 'unmkbootimg' from a third-party source, which is pre-packed in boot_img folder.
+The source of this tool: http://whiteboard.ping.se/Android/Unmkbootimg
+
+
+(8) Extract Original Boot Image
+
+Nexus factory image can be found at:
+https://developers.google.com/android/nexus/images
+
+In the archive, open the zip image file, and extract boot.img to 'boot_img' folder.
+
+Then use unmkbootimg to extract it.
+==========
+cd ../boot_img
+./unmkbootimg boot.img
+==========
+
+Now you will have 'initramfs.cpio.gz' (ramdisk) and zImage (kernel), zImage it the one we will replace.
+
+In the process of unpacking, you will see information similar to the following :
+
+
+unmkbootimg version 1.2 - Mikael Q Kuisma <kuisma@ping.se>
+Kernel size 6722240
+Kernel address 0x80208000
+Ramdisk size 492556
+Ramdisk address 0x82200000
+Secondary size 0
+Secondary address 0x81100000
+Kernel tags address 0x80200100
+Flash page size 2048
+Board name is ""
+Command line "console=ttyHSL0,115200,n8 androidboot.hardware=flo user_debug=31 msm_rtb.filter=0x3F ehci-hcd.park=3"
+
+*** WARNING ****
+This image is built using NON-standard mkbootimg!
+OFF_RAMDISK_ADDR is 0x02000000
+Please modify mkbootimg.c using the above values to build your image.
+****************
+
+Extracting kernel to file zImage ...
+Extracting root filesystem to file initramfs.cpio.gz ...
+All done.
+---------------
+To recompile this image, use:
+  mkbootimg --kernel zImage --ramdisk initramfs.cpio.gz --base 0x80200000 --cmdline 'console=ttyHSL0,115200,n8 androidboot.hardware=flo user_debug=31 msm_rtb.filter=0x3F ehci-hcd.park=3' -o new_boot.img
+---------------
+
+By using the command it provides, plus consideration of the WARNING (despite it saying we need to recompile, there is a command option of --ramdisk_offset 0x02000000), we can have the full command we will show.
+
+Note that there are many similar tools to unpack boot.img, e.g. on XDA forum, but this is the only one emit the warning message and instruction to repack.
+
+
+(9) Pack New Boot Image
+
+Since the boot.img is split into kernel and ramdisk, we need to replace the kernel (zImage), which located in 'msm' folder, and repack boot.img.
+
+==========
+../core/mkbootimg/mkbootimg --kernel ../msm/arch/arm/boot/zImage --ramdisk initramfs.cpio.gz --base 0x80200000 --ramdisk_offset 0x02000000 --cmdline 'console=ttyHSL0,115200,n8 androidboot.hardware=flo user_debug=31 msm_rtb.filter=0x3F ehci-hcd.park=3' -o new_boot.img
+==========
+
+Now you have new_boog.img in 'boot_img' folder.
+
+
+(10) Boot the New Image
+
+Boot the device into bootloader:
+==========
+adb reboot bootloader
+(boot the device into bootloader)
+fastboot boot new_boot.img
+(boot with the new boot image)
+==========
+
+If the device boots, and in Setting-About you can see your kernel version with your host name and recent kernel build time, you have the newly built kernel running.
+
+
+(11) Run Your Experiments
+
+Now you can run experiments in adb shell.
+

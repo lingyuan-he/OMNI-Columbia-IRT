@@ -52,7 +52,7 @@ tar xvf libnetfilter_queue-$LIBNETFILTER_VER.tar
 cd libnetfilter_queue-$LIBNETFILTER_VER
 # use patch from HIP
 patch -N src/extra/tcp.c < ../../patches/libnetfilter_queue/tcp.c.patch
-PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure  --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include" LDFLAGS="-L$INSTALL_PATH/lib" #-static
+PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure  --prefix=$INSTALL_PATH --host=$HOST CFLAGS="-I$INSTALL_PATH/include" LDFLAGS="-L$INSTALL_PATH/lib"
 make
 make install
 cd ../
@@ -66,7 +66,7 @@ tar zxvf hipl-$HIPL_VER.tar.gz
 
 # compile hipl
 cd hipl-$HIPL_VER
-PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH ANDROID_SYSROOT=$TOOLCHAIN_FOLDER/sysroot LDFLAGS=-L$INSTALL_PATH/lib CFLAGS="-I$INSTALL_PATH/include -static -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_N -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall -fPIC" CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --enable-android --disable-android-pie --host=$HOST --prefix=$INSTALL_PATH/hipl
+PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH ANDROID_SYSROOT=$TOOLCHAIN_FOLDER/sysroot LDFLAGS=-L$INSTALL_PATH/lib CFLAGS="-I$INSTALL_PATH/include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_N -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall -fPIC" CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld NM=${TOOLCHAIN}nm ./configure --enable-android --disable-android-pie --disable-dependency-tracking --host=$HOST --prefix=$INSTALL_PATH/hipl
 make
 make install
 cd ../

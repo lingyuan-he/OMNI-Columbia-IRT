@@ -21,7 +21,7 @@ if [ ! -f openssl-$OPENSSL_VER.tar.gz ]; then
 fi
 tar zxvf openssl-$OPENSSL_VER.tar.gz
 cd openssl-$OPENSSL_VER
-CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld ./config shared no-asm --prefix=$INSTALL_PATH #no-shared
+CC=${TOOLCHAIN}gcc AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib LD=${TOOLCHAIN}ld ./config shared no-asm no-shared --prefix=$INSTALL_PATH
 sed 's/-m64//g' -i Makefile # arm compiler doesn't support -m64
 make
 make install
@@ -33,7 +33,7 @@ if [ ! -f zlib-$ZLIB_VER.tar.gz ]; then
 fi
 tar zxvf zlib-$ZLIB_VER.tar.gz
 cd zlib-$ZLIB_VER
-CC=${TOOLCHAIN}gcc LD=${TOOLCHAIN}ld AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib ./configure --prefix=$INSTALL_PATH #--static
+CC=${TOOLCHAIN}gcc LD=${TOOLCHAIN}ld AR=${TOOLCHAIN}ar RANLIB=${TOOLCHAIN}ranlib CFLAGS="-static" ./configure --prefix=$INSTALL_PATH
 make
 make install
 cd ../
