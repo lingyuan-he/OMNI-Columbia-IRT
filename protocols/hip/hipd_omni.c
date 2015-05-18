@@ -10,9 +10,7 @@ void hipd_omni_cleanup(int signo) {
 
 	HIP_INFO("hipd omni: receiving signal %d, terminating\n", signo);
 	
-	//pthread_mutex_destroy(&hipd_omni_mutex);
 	close(hipd_omni_socket);
-	
 }
 
 /* update current interface name */
@@ -43,11 +41,6 @@ void hipd_omni_main(void) {
 		HIP_INFO("hipd omni: failed to setup handler for SIGERM\n");
 		return;
 	}
-	
-	/* mutex init */
-	//pthread_mutex_init(&hipd_omni_mutex);
-	
-	//pthread_cleanup_push(hipd_omni_cleanup, NULL);
 	
 	/* current interface */
 	hipd_omni_update_ifname();
@@ -88,9 +81,6 @@ void hipd_omni_main(void) {
 			break;
 		}
 		
-		/* cancel point */
-		//pthread_testcancel();
-		
 		/* we have new input */
 		if (FD_ISSET(hipd_omni_socket, &tmp_rfds)) {
 
@@ -104,7 +94,10 @@ void hipd_omni_main(void) {
 			
 			/* interface preference change */
 			if (strcmp(buf, "pref") == 0) {
+				/* update current interface */
+				hipd_omni_update_ifname();
 				HIP_INFO("hipd omni: received preference %s\n", buf + 5);
+				/* no need to switch */
 				if (strcmp(buf + 5, hipd_omni_ifname) == 0) {
 					HIP_INFO("hipd omni: already on %s\n", buf + 5);
 					strcpy(result, "0");
@@ -244,7 +237,6 @@ char *hipd_omni_get_ifname(void) {
 
 	/* read all entries */
 	while (fscanf(fp, "%s %s", str, ifname) > 0) {
-		//HIP_INFO("-%s-%s-\n", str, ifname);
 		/* when ip part is not all 0 */
 		if (strcmp(str, "0.0.0.0") == 0) {
 			found = 1;
