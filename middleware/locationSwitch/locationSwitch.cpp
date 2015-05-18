@@ -179,7 +179,7 @@ int main()
 	std::vector<client_info> applist;
 	std::string input_buf;
 
-	loc = "home";
+	loc = "columbia";
 	
 	std::cout << "Location Switch Utility" << std::endl;
 	std::cout << "home - eth0" << std::endl;
