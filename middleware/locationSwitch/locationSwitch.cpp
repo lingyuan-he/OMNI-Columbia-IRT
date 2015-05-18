@@ -179,7 +179,13 @@ int main()
 	std::vector<client_info> applist;
 	std::string input_buf;
 
-	loc = "columbia";
+	loc = "home";
+	
+	std::cout << "Location Switch Utility" << std::endl;
+	std::cout << "home - eth0" << std::endl;
+	std::cout << "columbia - wlan0" << std::endl;
+	std::cout << "car - sixxs" << std::endl << std::endl;
+	
 	std::cout << "The current location is " << loc << std::endl;
 
 	pthread_create(&query_thread, NULL, query_handler, (void *)&applist);
