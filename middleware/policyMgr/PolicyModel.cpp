@@ -343,32 +343,32 @@ char* policyModel(int appID, int sockfd)
                 }
                 tempStore[interIndex]='\0';
                 int init1=0;
-                int k=0;
+                j=0;
                     for(;init1<=strlen(tempStore);init1++)
                     {
                         if(tempStore[init1]!=' ' && tempStore[init1]!='\0')
                         {
-                            metadata[k]=tempStore[init1];
-                            k++;
+                            metadata[j]=tempStore[init1];
+                            j++;
                         }
                         else
                         {
-                            metadata[k]='\0';
+                            metadata[j]='\0';
                             break;
                         }
                     }
                     init1=init1+1;
-                    k=0;
+                    j=0;
                     for(;init1<=strlen(tempStore);init1++)
                     {
                         if(tempStore[init1]!=' ' && tempStore[init1]!='\0')
                         {
-                            data1[k]=tempStore[init1];
-                            k++;
+                            data1[j]=tempStore[init1];
+                            j++;
                         }
                         else
                         {
-                            data1[k]='\0';
+                            data1[j]='\0';
                             break;
                         }
                     }
@@ -462,7 +462,6 @@ char* policyModel(int appID, int sockfd)
                 for(int i=0;i<condCount;i++)
                 {
                      in.getline(str, 255);
-			
 			int condOffset = 0;
 			int status = 1;
 			while (condOffset < strlen(str))
