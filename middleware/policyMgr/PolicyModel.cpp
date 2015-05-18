@@ -343,32 +343,32 @@ char* policyModel(int appID, int sockfd)
                 }
                 tempStore[interIndex]='\0';
                 int init1=0;
-                j=0;
+                int k=0;
                     for(;init1<=strlen(tempStore);init1++)
                     {
                         if(tempStore[init1]!=' ' && tempStore[init1]!='\0')
                         {
-                            metadata[j]=tempStore[init1];
-                            j++;
+                            metadata[k]=tempStore[init1];
+                            k++;
                         }
                         else
                         {
-                            metadata[j]='\0';
+                            metadata[k]='\0';
                             break;
                         }
                     }
                     init1=init1+1;
-                    j=0;
+                    k=0;
                     for(;init1<=strlen(tempStore);init1++)
                     {
                         if(tempStore[init1]!=' ' && tempStore[init1]!='\0')
                         {
-                            data1[j]=tempStore[init1];
-                            j++;
+                            data1[k]=tempStore[init1];
+                            k++;
                         }
                         else
                         {
-                            data1[j]='\0';
+                            data1[k]='\0';
                             break;
                         }
                     }
@@ -376,8 +376,8 @@ char* policyModel(int appID, int sockfd)
 
                 Action act; // Assigning actions to rules and itnerfaces to actions.
                 ConditionList cl[condCount];
-                rules[j].action=&act;
-                rules[j].condList=cl;
+                rules[k].action=&act;
+                rules[k].condList=cl;
 
                 if(!strcmp(metadata,"inter"))
                 {
@@ -462,6 +462,7 @@ char* policyModel(int appID, int sockfd)
                 for(int i=0;i<condCount;i++)
                 {
                      in.getline(str, 255);
+			
 			int condOffset = 0;
 			int status = 1;
 			while (condOffset < strlen(str))
@@ -471,8 +472,8 @@ char* policyModel(int appID, int sockfd)
 				memset(metadata,0,10);
 				char data2[20] = {0};
 				int init2=0;
-				j=0;
-				condOffset=parseCondition(tempStore,metadata,data2,str,condOffset,init2, dataIndex, j) + 1;
+				k=0;
+				condOffset=parseCondition(tempStore,metadata,data2,str,condOffset,init2, dataIndex, k) + 1;
 
 				if (!evaluate(&act, cl, metadata, data2))
 				{
@@ -724,3 +725,4 @@ int evaluate (Action* act, ConditionList* cl, char* metadata, char* data2)
 
                 return 1;
 }
+
