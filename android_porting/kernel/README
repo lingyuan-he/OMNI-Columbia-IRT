@@ -213,13 +213,13 @@ Additional Information
 
 (1) Load Kernel Modules Manually
 
-While there should be a way for HIPL to correctly utilize 'modprobe' to load kernel modules dynamiclly, this section is on how to load a kernel module manually.
+While there should be a way for HIPL to correctly utilize 'modprobe' to load kernel modules dynamically, this section is on how to load a kernel module manually.
 
 Back in the step of kernel compilation, you can recall modules being compiled like this:
   CC      crypto/crypto_null.mod.o
   LD [M]  crypto/crypto_null.ko
 
-You need to push the .ko mudules to Android, and then load them using 'insmod' utility.
+You need to push the .ko modules to Android, and then load them using 'insmod' utility.
 
 Example
 
