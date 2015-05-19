@@ -36,21 +36,23 @@ http://www.droidviews.com/list-of-android-device-codenames/
 (Example: Nexus 7 is flo)
 
 
-Reference Google 'Building Kernel' guidlines:
+Reference Google 'Building Kernel' guidelines:
 https://source.android.com/source/building-kernels.html
 
 
 Here is an example of Nexus 7 (flo):
 
 ==========
+cd ../
+(back to 'kernel')
 git clone https://android.googlesource.com/kernel/msm
 (kernel/msm is in 'source location')
 cd msm
-(initially empty, need to checkout a bracnh)
+(initially empty, need to checkout a branch)
 git branch -a
 (list all branches)
 git checkout android-msm-flo-3.4-kitkat-mr2
-(choose the branch of correct Android version kitkat and codename flo)
+(choose the branch of the correct Android version kitkat and codename flo)
 ==========
 
 
@@ -70,7 +72,7 @@ In the development, a newer toolchain 4.8 does not work with the kernel version,
 
 (4) Environment Variables
 
-Note you need to put full path for CROSS_COMPILE:
+Note you need to use the full path for CROSS_COMPILE:
 ==========
 cd msm
 export ARCH=arm
@@ -83,11 +85,11 @@ These are essential for kernel configuration and building.
 
 (5) Configure Kernel
 
-We need to select configuration, and add kernel module as required.
+We need to select configuration, and add kernel modules as required.
 
 ==========
-make hammerhead_defconfig
-(kernel pre-config, hammerhead_defconfig is in 'build configuration'
+make flo_defconfig
+(kernel pre-config, flo_defconfig is indicated in 'build configuration' on Google webpage)
 make menuconfig
 (this will start interactive kernel configuration)
 ==========
@@ -97,6 +99,8 @@ In the configuration menu, enable the following (taken from HIPL document):
 - Networking support > Networking options > IP: IPsec BEET mode
 - Device drivers > Network device support > Dummy net driver support
 - Cryptographic API > Null algorithms
+
+All items need to be compiled as modules (clieck 'm'), except the first one.
 
 Select Exit and answer Yes to save configuration.
 
@@ -112,7 +116,7 @@ Kernel image will be compiled to: msm/arch/arm/boot/zImage
 
 (7) Prepare Boot Image Tools
 
-First compiling boot image compile tool from Google. Many commands reference to: https://gist.github.com/jberkel/1087757.
+First, compile boot image packing tool from Google. Many commands reference to: https://gist.github.com/jberkel/1087757.
 
 ==========
 cd ../
@@ -205,7 +209,40 @@ fastboot boot new_boot.img
 If the device boots, and in Setting-About you can see your kernel version with your host name and recent kernel build time, you have the newly built kernel running.
 
 
-(11) Run Your Experiments
+Additional Information
 
-Now you can run experiments in adb shell.
+(1) Load Kernel Modules Manually
+
+While there should be a way for HIPL to correctly utilize 'modprobe' to load kernel modules dynamiclly, this section is on how to load a kernel module manually.
+
+Back in the step of kernel compilation, you can recall modules being compiled like this:
+  CC      crypto/crypto_null.mod.o
+  LD [M]  crypto/crypto_null.ko
+
+You need to push the .ko mudules to Android, and then load them using 'insmod' utility.
+
+Example
+
+On Linux:
+==========
+adb push crypto_null.ko /data/misc
+==========
+
+On Android
+==========
+su
+insmod /data/misc/crypto_null.ko
+==========
+
+
+(2) HIPL on Android
+
+Documentation on Android is available on HIPL website:
+http://infrahip.hiit.fi/hipl/manual/HOWTO.html#android
+
+For now, HIPL keeps complaining on "The modprobe tool is not installed, will not load modules", although there is a version installed in busybox.
+But modprobe in busybox is also emitting error, "modprobe: can't change directory to '/lib/modules': No such file or directory", indicating further problem.
+
+A possible solution is to find an Android specific 'modprobe', one reference link:
+https://github.com/sherpya/android-busybox/blob/master/modutils/modprobe.c
 
