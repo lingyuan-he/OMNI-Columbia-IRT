@@ -1,27 +1,68 @@
-To build the whole project:
-Enter the git root directory and type the following command
-	./configure
-	make all
-	sudo make install
+Unified Heterogeneous Networking Middleware
+Columbia IRT Lab - 05/2015
 
-Configuration files
-MIH:
-	./protocols/mih/dist/802_3/link_sap.conf
-	./protocols/mih/dist/802_11/link_sap.conf
-	./protocols/mih/dist/lte/link_sap.conf
-HIP:
-	/usr/local/etc/hip/known_host_identities.xml
-MIPv6:
-	/usr/local/etc/mip6d.conf
-Policy Engine:
-	/etc/sine_policy.conf
-SOCKS:
-	/etc/srelay.conf
 
-To run the project, run the following five components one by one in different terminals:
-	mih	(Network Manager)
-	lm	(Location Manager)
-	sudo hip -v	(HIP Daemon)
-	sudo mip6d	(MIPv6 Daemon)
-	sined -f -c /etc/srelay.conf	(SOCKS, Policy Engine and Connection Manager)
+Installation
+
+
+Linux
+
+$ ./configure
+Need sudo to install required libraries
+Will take a while to complete in the first run
+
+$ make
+
+$ sudo make install
+After installation, you have those action available:
+
+Start HIPL
+$ sudo hipd
+
+Start ODTONE
+$ sudo mih
+
+Start location swither
+$ locsw
+
+Start middleware
+$ sudo sined -f
+
+Note that you will always need MIH running first to launch middleware, otherwise middleware will run briefly and halt. It is not really important on when HIPL should be launched.
+
+
+Android
+
+While there is no working demo or example on Android, we have guide to device preparation, kernel configuration and cross-compilation to start with.
+
+Prepare Device
+Before continue to cross-compile, the device need to be prepared:
+Get adb and fastboot working with your device, here are some reference link if you are unfamiliar with the process:
+    http://developer.android.com/tools/help/adb.html#Enabling
+    http://developer.android.com/tools/device.html
+Root the device, an example tutorial: http://www.ibtimes.co.uk/root-nexus-5-nexus-7-2012-wi-fi-android-5-1-lmy47d-lollipop-firmware-1491474
+    (You also need to enable su in adb shell)
+Install busybox to have a full set of utilities, such as awk and patch:
+https://play.google.com/store/apps/details?id=stericson.busybox&hl=en
+
+Kernel Compilation
+You will need your device to boot with a custom kernel (and kernel modules) in order to experiment with HIP (or other component in the future).
+Instructions on how to prepare and compile a custom kernel, and information on booting Android with custom kernel, can all be found in android_porting/kernel/README
+
+Cross Compilation
+Cross-compilation is done entirely with script, using toolchain arm-linux-androideabi from NDK. We will cover the work of cross-compilation in details later in the report.
+
+On Linux:
+$ cd android_porting
+$ ./dependency.sh
+This will install standalone adb and fastboot, and also libncurses needed by kernel compilation. 
+
+$ ./compile
+This script will download Google NDK, build toolchain inside toolchain folder, and use the toolchain to cross-compile all software components (except the switching support on Linux). It will take a period of time to cross-compile everything.
+Before pushing files, change interface MAC addresses inside install/odtone/lte/link_sap.conf and install/odtone/802_11/link_sap.conf to addresses of LTE and WiFi interface on Android device.
+Note that MAC addresses can be checked on Android using netcfg.
+Then push all relevant files. The following script will push the executables onto android on rightful place
+
+$ ./push.sh
+Now you should have the same contents of odtone/hipl/sine folders on Android in /data/misc/install, with a few exception that configuration files being uploaded to somewhere else.
 
